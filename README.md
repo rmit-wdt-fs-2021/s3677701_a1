@@ -1,1 +1,1 @@
-# s3677701_a1
+# First assignment for Web development technologies Flexible semester.
