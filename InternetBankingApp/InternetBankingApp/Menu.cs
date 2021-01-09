@@ -18,6 +18,7 @@ namespace InternetBankingApp
     public class Menu
     {
 
+
         public void Run()
         {
             while (true)
@@ -51,7 +52,7 @@ namespace InternetBankingApp
                 switch (choice)
                 {
                     case MenuChoice.ATMTransactions:
-                        Console.WriteLine("Displaying ATM");
+                        DisplayATMMenu();
                         break;
                     case MenuChoice.Transfer:
                         break;
@@ -62,12 +63,116 @@ namespace InternetBankingApp
                         break;
                     case MenuChoice.Exit:
                         Console.WriteLine("Closing app..");
-                        return;
+                        Environment.Exit(0);
+                        break;
                     default:
                         throw new InvalidOperationException();
                 }
             }
         }
+
+        public void DisplayLogin()
+        {
+            Console.WriteLine(
+@"--- Login Menu ---
+Please enter your Login Id: ");
+        }
+
+
+        public void DisplayATMMenu()
+        {
+            while (true)
+            {
+                Console.Write(
+@"--- ATM Menu ---
+Please select an option from the following:
+
+1. Deposit Money
+2. Withdraw Money
+3. Return to Main Menu");
+
+
+                var input = Console.ReadLine();
+                Console.WriteLine();
+
+                if (!int.TryParse(input, out int option) || !(option is >= 1 and <= 3))
+                {
+                    Console.WriteLine("Invalid input.");
+                    Console.WriteLine();
+                    continue;
+                }
+
+                switch (option)
+                {
+                    case 1:
+                        // Deposit
+                        break;
+                    case 2:
+                        // Withdraw
+                        break;
+                    case 3:
+                        Run();
+                        break;
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+        }
+
+        public void DisplayAccounts()
+        {
+            while (true)
+            {
+                Console.Write(
+@"--- Select Account ---
+
+Select an account to deposit money into:
+
+1. Savings Account - {}
+2. Checking Account - {}
+3. Return to Main Menu");
+
+
+                var input = Console.ReadLine();
+                Console.WriteLine();
+
+                if (!int.TryParse(input, out int option) || !(option is >= 1 and <= 3))
+                {
+                    Console.WriteLine("Invalid input.");
+                    Console.WriteLine();
+                    continue;
+                }
+
+                switch (option)
+                {
+                    case 1:
+                        // Deposit
+                        break;
+                    case 2:
+                        // Withdraw
+                        break;
+                    case 3:
+                        Run();
+                        break;
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+        }
+
+
+        public void DisplayDeposit()
+        {
+            Console.Write(
+@"--- Deposit Amount ----
+
+Your available balance is ${}
+
+Enter the amount you would like to deposit, or press enter to return : $");
+
+        }
+
+        // Get input
 
     }
 }
