@@ -14,6 +14,7 @@ namespace InternetBankingApp.Services
     {
         public bool AuthenticateUser(string loginId)
         {
+            // Call to db ?
             return false;
         }
 
@@ -24,6 +25,15 @@ namespace InternetBankingApp.Services
             var logins = JsonConvert.DeserializeObject<List<Login>>(loginJson);
 
             return logins;
+        }
+
+        public void InsertLogins()
+        {
+            var logins = GetLogins();
+            foreach(var login in logins)
+            {
+
+            }
         }
     }
 }

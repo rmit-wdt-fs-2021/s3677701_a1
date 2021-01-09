@@ -13,6 +13,6 @@ namespace InternetBankingApp.Models
         public int DestinationAccountNumber { get; set; }
         public double Amount { get; set; }
         public string Comment { get; set; }
-        public DateTime TransActionTimeUtc { get; set; }
+        public DateTime TransactionTimeUtc { get; set; }
     }
 }

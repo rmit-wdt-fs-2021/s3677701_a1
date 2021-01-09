@@ -22,6 +22,6 @@ namespace InternetBankingApp.Models
 
         public double Balance { get; set; }
 
-        public IList<DateTime> TransactionDates { get; set; }
+        public IList<Transaction> Transactions { get; set; }
     }
 }
