@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 
 namespace InternetBankingApp
 {
@@ -6,7 +7,10 @@ namespace InternetBankingApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World! Internet banking lets goo");
+            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            var connectionString = configuration["ConnectionString"];
+
+            new Menu().Run();
         }
     }
 }
