@@ -1,4 +1,5 @@
-﻿using InternetBankingApp.Models;
+﻿using InternetBankingApp.Interfaces;
+using InternetBankingApp.Models;
 using InternetBankingApp.Utilities;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace InternetBankingApp.Managers
 {
-    public class CustomerManager
+    public class CustomerManager : ICustomerManager
     {
         private readonly string _connectionString;
         public CustomerManager(string connectionString)
@@ -33,20 +34,22 @@ namespace InternetBankingApp.Managers
                 PostCode = (string)x["PostCode"]
             }).ToList();
         }
-        
-        public async Task InsertCustomerAsync(Customer customer)
+
+        public void InsertCustomer(Customer customer)
         {
             using var connection = _connectionString.CreateConnection();
             connection.Open();
 
             var cmd = connection.CreateCommand();
-            cmd.CommandText = "insert into Customer (CustomerID, Name, Address, City, PostCode) values (@customerID, @name, @city, @postCode)";
+            cmd.CommandText = "insert into Customer (CustomerID, Name, Address, City, PostCode) values (@customerID, @name, @address, @city, @postCode)";
             cmd.Parameters.AddWithValue("customerID", customer.CustomerID);
             cmd.Parameters.AddWithValue("name", customer.Name);
+            cmd.Parameters.AddWithValue("address", customer.Address);
             cmd.Parameters.AddWithValue("city", customer.City);
             cmd.Parameters.AddWithValue("postCode", customer.PostCode);
 
-            await cmd.ExecuteNonQueryAsync();
+            cmd.ExecuteNonQuery();
         }
     }
+
 }

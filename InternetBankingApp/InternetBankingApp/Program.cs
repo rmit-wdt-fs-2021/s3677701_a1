@@ -11,8 +11,9 @@ namespace InternetBankingApp
         {
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
             var connectionString = configuration["ConnectionString"];
-            new LoginService().InsertLoginsAsync(connectionString);
-            new Menu().Run();
+            //new LoginService().InsertLoginsAsync(connectionString);
+            new CustomerService().InsertCustomers(connectionString);
+            //new Menu().Run();
         }
     }
 }

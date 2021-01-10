@@ -11,7 +11,7 @@ using InternetBankingApp.Managers;
 
 namespace InternetBankingApp.Services
 {
-    public class LoginService : ILoginService
+    public class LoginService
     {
         public bool AuthenticateUser(string loginId)
         {
@@ -19,22 +19,22 @@ namespace InternetBankingApp.Services
             return false;
         }
 
-        public IList<Login> GetLogins()
+        public async Task<IList<Login>> GetLoginsAsync()
         {
             using var client = new HttpClient();
-            var loginJson = client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/logins/").Result;
-            var logins = JsonConvert.DeserializeObject<List<Login>>(loginJson);
+            var loginResponse = await client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/logins/").ConfigureAwait(false);
+            var logins = JsonConvert.DeserializeObject<List<Login>>(loginResponse);
 
             return logins;
         }
 
         public async Task InsertLoginsAsync(string connectionString)
         {
-            var logins = GetLogins();
+            var logins = await GetLoginsAsync().ConfigureAwait(false);
             var loginManager = new LoginManager(connectionString);
             foreach(var login in logins)
             {
-                await loginManager.InsertLoginAsync(login);
+                await loginManager.InsertLoginAsync(login).ConfigureAwait(false);
             }
         }
     }
