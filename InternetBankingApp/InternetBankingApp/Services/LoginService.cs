@@ -13,13 +13,21 @@ namespace InternetBankingApp.Services
 {
     public class LoginService
     {
+        private readonly ILoginManager _loginManager;
+
+        public LoginService(string connectionString)
+        {
+            _loginManager = new LoginManagerProxy(connectionString);
+        }
+
         public bool AuthenticateUser(string loginId)
         {
             // Call to db ?
+            _loginManager.GetLogin(loginId);
             return false;
         }
 
-        public async Task<IList<Login>> GetLoginsAsync()
+        private async Task<IList<Login>> GetLoginsAsync()
         {
             using var client = new HttpClient();
             var loginResponse = await client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/logins/");
@@ -28,13 +36,12 @@ namespace InternetBankingApp.Services
             return logins;
         }
 
-        public void InsertLogins(string connectionString)
+        public void InsertLogins()
         {
             var logins = GetLoginsAsync().Result;
-            var loginManager = new LoginManager(connectionString);
             foreach (var login in logins)
             {
-                loginManager.InsertLoginAsync(login);
+                _loginManager.InsertLoginAsync(login);
             }
         }
     }

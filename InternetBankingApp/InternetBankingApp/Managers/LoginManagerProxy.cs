@@ -17,7 +17,7 @@ namespace InternetBankingApp.Managers
             _connectionString = connectionString;
         }
 
-        public List<Login> GetLogin(int loginID)
+        public List<Login> GetLogin(string loginID)
         {
             if (_logins.Any())
             {

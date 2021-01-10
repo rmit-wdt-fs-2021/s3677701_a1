@@ -18,8 +18,12 @@ namespace InternetBankingApp
     public class Menu
     {
 
+        public Menu()
+        {
+            DisplayLogin();
+        }
 
-        public void Run()
+        public void DisplayMainMenu()
         {
             while (true)
             {
@@ -111,7 +115,7 @@ Please select an option from the following:
                         // Withdraw
                         break;
                     case 3:
-                        Run();
+                        DisplayMainMenu();
                         break;
                     default:
                         throw new InvalidOperationException();
@@ -152,7 +156,7 @@ Select an account to deposit money into:
                         // Withdraw
                         break;
                     case 3:
-                        Run();
+                        DisplayMainMenu();
                         break;
                     default:
                         throw new InvalidOperationException();
