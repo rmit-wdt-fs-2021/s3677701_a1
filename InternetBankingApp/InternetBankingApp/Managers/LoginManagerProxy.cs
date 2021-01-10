@@ -1,34 +1,41 @@
-﻿using InternetBankingApp.Models;
-using Microsoft.Data.SqlClient;
+﻿using InternetBankingApp.Interfaces;
+using InternetBankingApp.Models;
+using InternetBankingApp.Utilities;
 using System.Collections.Generic;
 using System.Linq;
-using InternetBankingApp.Utilities;
 using System.Threading.Tasks;
 
 namespace InternetBankingApp.Managers
 {
-    public class LoginManager
+    public class LoginManagerProxy : ILoginManager
     {
         private readonly string _connectionString;
+        private List<Login> _logins;
 
-        public LoginManager(string connectionString)
+        public LoginManagerProxy(string connectionString)
         {
             _connectionString = connectionString;
         }
 
         public List<Login> GetLogin(int loginID)
         {
-            using var connection = new SqlConnection(_connectionString);
+            if (_logins.Any())
+            {
+                return _logins;
+            }
+
+            using var connection = _connectionString.CreateConnection();
             var command = connection.CreateCommand();
             command.CommandText = "select * from Login where LoginID = @loginID";
             command.Parameters.AddWithValue("loginId", loginID);
 
-            return command.GetDataTable().Select().Select(x => new Login
+            _logins = command.GetDataTable().Select().Select(x => new Login
             {
                 LoginID = (string)x["LoginID"],
                 CustomerID = (int)x["CustomerID"],
                 PasswordHash = (string)x["PasswordHash"]
             }).ToList();
+            return _logins;
         }
 
         public async Task InsertLoginAsync(Login login)

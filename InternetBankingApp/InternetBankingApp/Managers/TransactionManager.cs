@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InternetBankingApp.Interfaces
+namespace InternetBankingApp.Managers
 {
-    interface ILoginProxy
+    public class TransactionManager
     {
+
     }
 }

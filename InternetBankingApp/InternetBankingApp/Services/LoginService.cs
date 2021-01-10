@@ -22,19 +22,19 @@ namespace InternetBankingApp.Services
         public async Task<IList<Login>> GetLoginsAsync()
         {
             using var client = new HttpClient();
-            var loginResponse = await client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/logins/").ConfigureAwait(false);
+            var loginResponse = await client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/logins/");
             var logins = JsonConvert.DeserializeObject<List<Login>>(loginResponse);
 
             return logins;
         }
 
-        public async Task InsertLoginsAsync(string connectionString)
+        public void InsertLogins(string connectionString)
         {
-            var logins = await GetLoginsAsync().ConfigureAwait(false);
+            var logins = GetLoginsAsync().Result;
             var loginManager = new LoginManager(connectionString);
-            foreach(var login in logins)
+            foreach (var login in logins)
             {
-                await loginManager.InsertLoginAsync(login).ConfigureAwait(false);
+                loginManager.InsertLoginAsync(login);
             }
         }
     }
