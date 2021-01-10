@@ -29,9 +29,16 @@ namespace InternetBankingApp.Services
             var customers = GetCustomersAsync().Result;
 
             var customerManager = new CustomerManagerProxy(connectionString);
+            var accountManager = new AccountManager(connectionString);
             foreach (var customer in customers)
             {
                 customerManager.InsertCustomerAsync(customer);
+
+                foreach(var account in customer.Accounts)
+                {
+                    account.CustomerID = customer.CustomerID;
+                    accountManager.InsertAccountAsync(account);
+                }
             }
         }
     }

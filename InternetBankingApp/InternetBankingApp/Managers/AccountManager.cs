@@ -3,6 +3,7 @@ using InternetBankingApp.Models;
 using InternetBankingApp.Utilities;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace InternetBankingApp.Managers
 {
@@ -31,6 +32,20 @@ namespace InternetBankingApp.Managers
             }).ToList();
         }
 
+        public async Task InsertAccountAsync(Account account)
+        {
+            using var connection = _connectionString.CreateConnection();
+            connection.Open();
 
+            var command = connection.CreateCommand();
+            command.CommandText = 
+                "insert into Account (AccountNumber, AccountType, CustomerID, Balance) values (@accountNumber, @accountType, @customerID, @balance)";
+            command.Parameters.AddWithValue("accountNumber", account.AccountNumber);
+            command.Parameters.AddWithValue("accountType", account.AccountType);
+            command.Parameters.AddWithValue("customerID", account.CustomerID);
+            command.Parameters.AddWithValue("Balance", account.Balance);
+
+            await command.ExecuteNonQueryAsync();
+        }
     }
 }
