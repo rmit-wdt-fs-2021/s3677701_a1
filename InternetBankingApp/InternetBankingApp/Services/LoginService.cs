@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using InternetBankingApp.Managers;
 
 namespace InternetBankingApp.Services
 {
@@ -27,12 +28,13 @@ namespace InternetBankingApp.Services
             return logins;
         }
 
-        public void InsertLogins()
+        public async Task InsertLoginsAsync(string connectionString)
         {
             var logins = GetLogins();
+            var loginManager = new LoginManager(connectionString);
             foreach(var login in logins)
             {
-
+                await loginManager.InsertLoginAsync(login);
             }
         }
     }

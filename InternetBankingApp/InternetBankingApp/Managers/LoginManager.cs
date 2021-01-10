@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
 using System.Linq;
 using InternetBankingApp.Utilities;
+using System.Threading.Tasks;
 
 namespace InternetBankingApp.Managers
 {
@@ -30,7 +31,7 @@ namespace InternetBankingApp.Managers
             }).ToList();
         }
 
-        public void InsertLogin(Login login)
+        public async Task InsertLoginAsync(Login login)
         {
             using var connection = _connectionString.CreateConnection();
             connection.Open();
@@ -41,7 +42,7 @@ namespace InternetBankingApp.Managers
             command.Parameters.AddWithValue("customerID", login.CustomerID);
             command.Parameters.AddWithValue("passwordHash", login.PasswordHash);
 
-            command.ExecuteNonQuery();
+            await command.ExecuteNonQueryAsync();
         }
     }
 }
