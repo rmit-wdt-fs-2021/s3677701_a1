@@ -47,11 +47,11 @@ namespace InternetBankingApp.Managers
             }
         }
 
-        public void InsertCustomer(Customer customer)
+        public async Task InsertCustomerAsync(Customer customer)
         {
             using var connection = _connectionString.CreateConnection();
             connection.Open();
-
+            // TODO : add try/catch ?
             var cmd = connection.CreateCommand();
             cmd.CommandText = "insert into Customer (CustomerID, Name, Address, City, PostCode) values (@customerID, @name, @address, @city, @postCode)";
             cmd.Parameters.AddWithValue("customerID", customer.CustomerID);
@@ -60,7 +60,7 @@ namespace InternetBankingApp.Managers
             cmd.Parameters.AddWithValue("city", customer.City ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("postCode", customer.PostCode ?? (object)DBNull.Value);
 
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
     }
 }

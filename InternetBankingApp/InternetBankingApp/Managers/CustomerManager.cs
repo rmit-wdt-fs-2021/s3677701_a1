@@ -35,7 +35,7 @@ namespace InternetBankingApp.Managers
             }).ToList();
         }
 
-        public void InsertCustomer(Customer customer)
+        public async Task InsertCustomerAsync(Customer customer)
         {
             using var connection = _connectionString.CreateConnection();
             connection.Open();
@@ -48,7 +48,7 @@ namespace InternetBankingApp.Managers
             cmd.Parameters.AddWithValue("city", customer.City);
             cmd.Parameters.AddWithValue("postCode", customer.PostCode);
 
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
     }
 

@@ -18,7 +18,7 @@ namespace InternetBankingApp.Models
 
         public string AccountType { get; set; }
         
-        public string CustomerID { get; set; }
+        public int CustomerID { get; set; }
 
         public double Balance { get; set; }
 
