@@ -33,16 +33,16 @@ namespace InternetBankingApp
                 // TODO replace dude with name
                 Console.Write(
  @"----- Main Menu ----
-   Welcome dude
+Welcome dude
 
-   Please select an option from the following:
+Please select an option from the following:
    
-   1. ATM Transaction
-   2. Transfer
-   3. My Statements
-   4. Logout
-   5. Exit
-   Enter an option: ");
+1. ATM Transaction
+2. Transfer
+3. My Statements
+4. Logout
+5. Exit
+Enter an option: ");
 
                 var input = Console.ReadLine();
                 Console.WriteLine();
@@ -91,16 +91,17 @@ Please enter your Login Id: ");
 
                 Console.Write(
 @"Please enter your password: ");
-                var passwordInput = Console.ReadLine(); //TODO : HIDE!!!
+                var passwordInput = GetPasswordFromInput();
                 Console.WriteLine();
-                if(_loginService.AuthenticateUser(loginIDInput, passwordInput))
+                if (_loginService.AuthenticateUser(loginIDInput, passwordInput))
                 {
-                    Console.Write("Logged in");
+                    Console.WriteLine("Logged in successfully");
                     DisplayMainMenu();
                 }
                 else
                 {
-                    Console.Write("HACK");
+                    Console.WriteLine("Incorrect loginID or password");
+                    continue;
                 }
 
             }
@@ -197,6 +198,28 @@ Your available balance is ${}
 
 Enter the amount you would like to deposit, or press enter to return : $");
 
+        }
+
+        private string GetPasswordFromInput()
+        {
+            var passwordBuilder = new StringBuilder();
+            bool continueReading = true;
+            char newLineChar = '\r';
+            while (continueReading)
+            {
+                ConsoleKeyInfo consoleKey = Console.ReadKey(true);
+                char passwordChar = consoleKey.KeyChar;
+
+                if (passwordChar == newLineChar)
+                {
+                    continueReading = false;
+                }
+                else
+                {
+                    passwordBuilder.Append(passwordChar.ToString());
+                }
+            }
+            return passwordBuilder.ToString();
         }
 
         // Get input
