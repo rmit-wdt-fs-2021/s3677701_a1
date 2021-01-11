@@ -8,10 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using InternetBankingApp.Managers;
+using SimpleHashing;
 
 namespace InternetBankingApp.Services
 {
-    public class LoginService
+    public class LoginService : ILoginService
     {
         private readonly ILoginManager _loginManager;
 
@@ -20,11 +21,10 @@ namespace InternetBankingApp.Services
             _loginManager = new LoginManagerProxy(connectionString);
         }
 
-        public bool AuthenticateUser(string loginId)
+        public bool AuthenticateUser(string loginId, string password)
         {
-            // Call to db ?
-            _loginManager.GetLogin(loginId);
-            return false;
+            var login = _loginManager.GetLogin(loginId);
+            return login != null && PBKDF2.Verify(login.PasswordHash, password);
         }
 
         private async Task<IList<Login>> GetLoginsAsync()

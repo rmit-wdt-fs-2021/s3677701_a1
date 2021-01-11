@@ -1,4 +1,6 @@
-﻿using System;
+﻿using InternetBankingApp.Interfaces;
+using InternetBankingApp.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,9 +19,10 @@ namespace InternetBankingApp
 
     public class Menu
     {
-
-        public Menu()
+        private readonly ILoginService _loginService;
+        public Menu(LoginService loginService)
         {
+            _loginService = loginService;
             DisplayLogin();
         }
 
@@ -77,11 +80,31 @@ namespace InternetBankingApp
 
         public void DisplayLogin()
         {
-            Console.WriteLine(
-@"--- Login Menu ---
+            while (true)
+            {
+                Console.Write(
+    @"--- Login Menu ---
 Please enter your Login Id: ");
-        }
 
+                var loginIDInput = Console.ReadLine();
+                Console.WriteLine();
+
+                Console.Write(
+@"Please enter your password: ");
+                var passwordInput = Console.ReadLine(); //TODO : HIDE!!!
+                Console.WriteLine();
+                if(_loginService.AuthenticateUser(loginIDInput, passwordInput))
+                {
+                    Console.Write("Logged in");
+                    DisplayMainMenu();
+                }
+                else
+                {
+                    Console.Write("HACK");
+                }
+
+            }
+        }
 
         public void DisplayATMMenu()
         {

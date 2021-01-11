@@ -11,7 +11,7 @@ namespace InternetBankingApp.Interfaces
         /// </summary>
         /// <param name="loginID"></param>
         /// <returns></returns>
-        public List<Login> GetLogin(string loginID);
+        public Login GetLogin(string loginID);
 
         /// <summary>
         /// 

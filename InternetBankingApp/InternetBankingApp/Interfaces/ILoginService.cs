@@ -9,7 +9,6 @@ namespace InternetBankingApp.Interfaces
 {
     public interface ILoginService
     {
-        public IList<Login> GetLogins();
-        public bool AuthenticateUser(string loginId);
+        public bool AuthenticateUser(string loginId, string password);
     }
 }

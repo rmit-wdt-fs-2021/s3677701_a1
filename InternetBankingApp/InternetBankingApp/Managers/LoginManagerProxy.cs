@@ -15,13 +15,15 @@ namespace InternetBankingApp.Managers
         public LoginManagerProxy(string connectionString)
         {
             _connectionString = connectionString;
+            _logins = new List<Login>();
         }
 
-        public List<Login> GetLogin(string loginID)
+        public Login GetLogin(string loginID)
         {
             if (_logins.Any())
             {
-                return _logins;
+                return (Login)_logins.Where(x =>
+                x.LoginID == loginID);
             }
 
             using var connection = _connectionString.CreateConnection();
@@ -35,11 +37,17 @@ namespace InternetBankingApp.Managers
                 CustomerID = (int)x["CustomerID"],
                 PasswordHash = (string)x["PasswordHash"]
             }).ToList();
-            return _logins;
+            return _logins.FirstOrDefault(x => x.LoginID == loginID);
         }
 
         public async Task InsertLoginAsync(Login login)
         {
+            if (_logins.Any())
+            {
+                // If logins are cached do not talk to DB.
+                return;
+            }
+
             using var connection = _connectionString.CreateConnection();
             connection.Open();
 

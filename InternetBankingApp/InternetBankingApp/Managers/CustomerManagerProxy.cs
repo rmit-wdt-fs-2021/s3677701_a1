@@ -49,6 +49,11 @@ namespace InternetBankingApp.Managers
 
         public async Task InsertCustomerAsync(Customer customer)
         {
+            if (_customers.Any())
+            {
+                return;
+            }
+
             using var connection = _connectionString.CreateConnection();
             connection.Open();
             // TODO : add try/catch ?
