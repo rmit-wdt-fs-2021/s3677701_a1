@@ -43,27 +43,19 @@ namespace InternetBankingApp.Managers
                 var command = connection.CreateCommand();
                 command.CommandText = "select * from Customer";
 
-                // TODO : var accountManager = new AccountManager(_connectionString); READ accounts from DB
-                try
-                {
+                var accountManager = new AccountManager(_connectionString); 
+              
                     _customers = command.GetDataTable().Select().Select(x => new Customer
                     {
                         CustomerID = (int)x["CustomerID"],
                         Name = (string)x["Name"],
                         Address = x["Address"],
                         City = x["City"],
-                        PostCode = x["PostCode"]
+                        PostCode = x["PostCode"],
+                        Accounts = accountManager.GetAccounts((int)x["CustomerID"])
                     }).ToList();
-                }
-                catch (InvalidCastException)
-                {
-                    // Workaround for cannot cast DBNull to string err. 
-                    _customers.Concat(command.GetDataTable().Select().Select(x => new Customer
-                    {
-                        CustomerID = (int)x["CustomerID"],
-                        Name = (string)x["Name"],
-                    }).ToList());
-                }
+                
+
                 return _customers;
             }
         }

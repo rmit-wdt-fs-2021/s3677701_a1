@@ -16,7 +16,7 @@ namespace InternetBankingApp.Managers
             _connectionString = connectionString;
         }
 
-        public List<Account> GetAccount(int customerID)
+        public List<Account> GetAccounts(int customerID)
         {
             using var connection = _connectionString.CreateConnection();
             var command = connection.CreateCommand();
@@ -28,7 +28,7 @@ namespace InternetBankingApp.Managers
                 AccountNumber = (int)x["AccountNumber"],
                 AccountType = (string)x["AccountType"],
                 CustomerID = (int)x["CustomerID"],
-                Balance = (double)x["Balance"]
+                Balance = (decimal)x["Balance"]
             }).ToList();
         }
 

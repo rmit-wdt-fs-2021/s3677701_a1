@@ -15,7 +15,7 @@ namespace InternetBankingApp.Models
         
         public int CustomerID { get; set; }
 
-        public double Balance { get; set; }
+        public decimal Balance { get; set; }
 
         public IList<Transaction> Transactions { get; set; }
     }
