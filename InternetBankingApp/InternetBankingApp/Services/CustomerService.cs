@@ -20,15 +20,14 @@ namespace InternetBankingApp.Services
 
         public Customer GetCustomer(int customerID)
         {
-            _customerManager.GetCustomer(customerID);
-            return null;
+            return _customerManager.GetCustomer(customerID);
         }
+
 
         private async Task<List<Customer>> GetCustomersAsync()
         {
             using var client = new HttpClient();
-            var customerResponse = await client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/customers/")
-                                               .ConfigureAwait(false);
+            var customerResponse = await client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/customers/");
 
             var customers = JsonConvert.DeserializeObject<List<Customer>>(customerResponse, new JsonSerializerSettings
             {

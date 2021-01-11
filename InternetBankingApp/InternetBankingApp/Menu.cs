@@ -1,4 +1,5 @@
 ﻿using InternetBankingApp.Interfaces;
+using InternetBankingApp.Models;
 using InternetBankingApp.Services;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace InternetBankingApp
     {
         private readonly ILoginService _loginService;
         private readonly ICustomerService _customerService;
+        private Customer _loggedInCustomer;
         public Menu(LoginService loginService, CustomerService customerService)
         {
             _loginService = loginService;
@@ -99,7 +101,7 @@ Please enter your Login Id: ");
                 {
                     Console.WriteLine("Logged in successfully");
                     var customerID = _loginService.GetCustomerIDFromLogin(loginIDInput);
-                    var loggedInCustomer = _customerService.GetCustomer(customerID);
+                    _loggedInCustomer = _customerService.GetCustomer(customerID);
                     DisplayMainMenu();
                 }
                 else
@@ -157,12 +159,12 @@ Please select an option from the following:
             while (true)
             {
                 Console.Write(
-@"--- Select Account ---
+@$"--- Select Account ---
 
 Select an account to deposit money into:
 
-1. Savings Account - {}
-2. Checking Account - {}
+1. Savings Account - {(_loggedInCustomer.HasSavingsAccount() ? "122" : "0")}
+2. Checking Account - {(_loggedInCustomer.HasCheckingAccount() ? "100" : "0")}
 3. Return to Main Menu");
 
 
