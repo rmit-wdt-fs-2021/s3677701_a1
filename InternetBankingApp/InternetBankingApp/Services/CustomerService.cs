@@ -9,9 +9,22 @@ using System.Threading.Tasks;
 
 namespace InternetBankingApp.Services
 {
-    public class CustomerService
+    public class CustomerService : ICustomerService
     {
-        public async Task<List<Customer>> GetCustomersAsync()
+        private readonly ICustomerManager _customerManager;
+
+        public CustomerService(string connectionString)
+        {
+            _customerManager = new CustomerManagerProxy(connectionString);
+        }
+
+        public Customer GetCustomer(int customerID)
+        {
+            _customerManager.GetCustomer(customerID);
+            return null;
+        }
+
+        private async Task<List<Customer>> GetCustomersAsync()
         {
             using var client = new HttpClient();
             var customerResponse = await client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/customers/")

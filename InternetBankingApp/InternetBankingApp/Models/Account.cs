@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace InternetBankingApp.Models
 {
-    public enum AccountType
-    {
-        Savings,
-        Checking
-    }
 
     public class Account
     {

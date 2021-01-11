@@ -27,6 +27,12 @@ namespace InternetBankingApp.Services
             return login != null && PBKDF2.Verify(login.PasswordHash, password);
         }
 
+        public int GetCustomerIDFromLogin(string loginID)
+        {
+            var login = _loginManager.GetLogin(loginID);
+            return login.CustomerID;
+        }
+
         private async Task<IList<Login>> GetLoginsAsync()
         {
             using var client = new HttpClient();

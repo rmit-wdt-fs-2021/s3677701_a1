@@ -18,10 +18,20 @@ namespace InternetBankingApp.Managers
         public CustomerManagerProxy(string connectionString)
         {
             _connectionString = connectionString;
-
+            _customers = new List<Customer>();
         }
 
-        public List<Customer> GetCustomers()
+        public Customer GetCustomer(int customerID)
+        {
+            if (_customers.Any())
+            {
+                return _customers.FirstOrDefault(x => x.CustomerID == customerID);
+            }
+
+            return GetAllCustomers().FirstOrDefault(x => x.CustomerID == customerID);
+        }
+
+        public List<Customer> GetAllCustomers()
         {
             if (_customers.Any())
             {
@@ -34,15 +44,25 @@ namespace InternetBankingApp.Managers
                 command.CommandText = "select * from Customer";
 
                 // TODO : var accountManager = new AccountManager(_connectionString);
-
-                _customers = command.GetDataTable().Select().Select(x => new Customer
+                try
                 {
-                    CustomerID = (int)x["CustomerID"],
-                    Name = (string)x["Name"],
-                    Address = (string)x["Address"],
-                    City = (string)x["City"],
-                    PostCode = (string)x["PostCode"]
-                }).ToList();
+                    _customers = command.GetDataTable().Select().Select(x => new Customer
+                    {
+                        CustomerID = (int)x["CustomerID"],
+                        Name = (string)x["Name"],
+                        Address = (string)x["Address"],
+                        City = (string)x["City"],
+                        PostCode = (string)x["PostCode"]
+                    }).ToList();
+                }
+                catch (InvalidCastException)
+                {
+                    _customers = command.GetDataTable().Select().Select(x => new Customer
+                    {
+                        CustomerID = (int)x["CustomerID"],
+                        Name = (string)x["Name"],
+                    }).ToList();
+                }
                 return _customers;
             }
         }

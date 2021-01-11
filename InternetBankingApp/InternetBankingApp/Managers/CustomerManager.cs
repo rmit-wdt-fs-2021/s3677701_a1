@@ -17,7 +17,13 @@ namespace InternetBankingApp.Managers
             _connectionString = connectionString;
         }
 
-        public List<Customer> GetCustomers()
+        public Customer GetCustomer(int customerID)
+        {
+            return GetAllCustomers().FirstOrDefault(x => x.CustomerID == customerID);
+
+        }
+
+        public List<Customer> GetAllCustomers()
         {
             using var connection = _connectionString.CreateConnection();
             var command = connection.CreateCommand();

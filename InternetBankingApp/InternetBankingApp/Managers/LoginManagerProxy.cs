@@ -22,8 +22,7 @@ namespace InternetBankingApp.Managers
         {
             if (_logins.Any())
             {
-                return (Login)_logins.Where(x =>
-                x.LoginID == loginID);
+                return _logins.FirstOrDefault(x => x.LoginID == loginID);
             }
 
             using var connection = _connectionString.CreateConnection();

@@ -20,9 +20,11 @@ namespace InternetBankingApp
     public class Menu
     {
         private readonly ILoginService _loginService;
-        public Menu(LoginService loginService)
+        private readonly ICustomerService _customerService;
+        public Menu(LoginService loginService, CustomerService customerService)
         {
             _loginService = loginService;
+            _customerService = customerService;
             DisplayLogin();
         }
 
@@ -49,7 +51,7 @@ Enter an option: ");
 
                 if (!int.TryParse(input, out int option) || !(option is >=1 and <=5) )
                 {
-                    Console.WriteLine("Invalid input.");
+                    Console.WriteLine("Invalid input. Please re-enter your selection.");
                     Console.WriteLine();
                     continue;
                 }
@@ -96,6 +98,8 @@ Please enter your Login Id: ");
                 if (_loginService.AuthenticateUser(loginIDInput, passwordInput))
                 {
                     Console.WriteLine("Logged in successfully");
+                    var customerID = _loginService.GetCustomerIDFromLogin(loginIDInput);
+                    var loggedInCustomer = _customerService.GetCustomer(customerID);
                     DisplayMainMenu();
                 }
                 else
@@ -134,6 +138,7 @@ Please select an option from the following:
                 {
                     case 1:
                         // Deposit
+                        DisplayAccounts();
                         break;
                     case 2:
                         // Withdraw
@@ -174,10 +179,10 @@ Select an account to deposit money into:
                 switch (option)
                 {
                     case 1:
-                        // Deposit
+                        // DepositSavings
                         break;
                     case 2:
-                        // Withdraw
+                        // DepositChecking()
                         break;
                     case 3:
                         DisplayMainMenu();
@@ -186,6 +191,16 @@ Select an account to deposit money into:
                         throw new InvalidOperationException();
                 }
             }
+        }
+
+        public void DepositSavings()
+        {
+            // Show balance
+        }
+
+        public void DisplayBalance()
+        {
+
         }
 
 
@@ -200,6 +215,11 @@ Enter the amount you would like to deposit, or press enter to return : $");
 
         }
 
+        /// <summary>
+        /// Hides users inputted keys.
+        /// Referenced from : https://dotnetcodr.com/2015/09/02/how-to-hide-the-text-entered-in-a-net-console-application/
+        /// </summary>
+        /// <returns>Hidden string input.</returns>
         private string GetPasswordFromInput()
         {
             var passwordBuilder = new StringBuilder();
@@ -222,7 +242,6 @@ Enter the amount you would like to deposit, or press enter to return : $");
             return passwordBuilder.ToString();
         }
 
-        // Get input
 
     }
 }
