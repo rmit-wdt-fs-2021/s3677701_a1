@@ -7,5 +7,6 @@ namespace InternetBankingApp.Interfaces
     {
         Task AddBalanceAsync(Account account, decimal balance);
         Account GetAccount(string accountType, Customer customer);
+        Task DeductBalanceAsync(Account account, decimal balance);
     }
 }

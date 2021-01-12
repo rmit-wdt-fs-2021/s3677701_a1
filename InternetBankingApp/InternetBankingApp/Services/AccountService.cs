@@ -1,4 +1,5 @@
-﻿using InternetBankingApp.Interfaces;
+﻿using InternetBankingApp.Exceptions;
+using InternetBankingApp.Interfaces;
 using InternetBankingApp.Managers;
 using InternetBankingApp.Models;
 using System;
@@ -26,11 +27,52 @@ namespace InternetBankingApp.Services
         {
             if (account is null)
             {
-                throw new ArgumentNullException("Account cannot be null");
+                throw new ArgumentNullException(nameof(account));
             }
             account.Balance += balance;
             await _accountManager.UpdateAccountBalanceAsync(account);
         }
 
+        public async Task DeductBalanceAsync(Account account, decimal balance)
+        {
+            if (account is null)
+            {
+                throw new ArgumentNullException($"{nameof(account)} cannot be null.");
+            }
+
+            if(ValidateWithdrawal(account, balance))
+            {
+                // Update DB
+                account.Balance -= balance;
+                await _accountManager.UpdateAccountBalanceAsync(account);
+            }
+            else
+            {
+                throw new AccountBalanceUpdateException($"Account cannot be deducted by {nameof(balance)}: ${balance}.");
+            }
+        }
+
+        private bool ValidateWithdrawal(Account account, decimal balance)
+        {
+            bool retVal = true;
+
+            // Balance must not go below certain amounts as a result of withrawal.
+            if (account.AccountType == "C")
+            {
+                if (account.Balance - balance <= 200)
+                {
+                    retVal = false;
+                }
+            }
+            else if (account.AccountType == "S")
+            {
+                if (account.Balance - balance <= 0)
+                {
+                    retVal = false;
+                }
+            }
+
+            return retVal;
+        }
     }
 }

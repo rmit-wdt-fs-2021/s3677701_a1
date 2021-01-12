@@ -1,4 +1,5 @@
-﻿using InternetBankingApp.Interfaces;
+﻿using InternetBankingApp.Exceptions;
+using InternetBankingApp.Interfaces;
 using InternetBankingApp.Models;
 using InternetBankingApp.Services;
 using InternetBankingApp.Utilities;
@@ -141,11 +142,10 @@ Please select an option from the following:
                 switch (option)
                 {
                     case 1:
-                        // Deposit
-                        DisplayAccounts();
+                        DisplayAccountsForDeposit();
                         break;
                     case 2:
-                        // Withdraw
+                        DisplayAccountsForWithdrawal();
                         break;
                     case 3:
                         DisplayMainMenu();
@@ -156,7 +156,77 @@ Please select an option from the following:
             }
         }
 
-        private void DisplayAccounts()
+        private void DisplayAccountsForWithdrawal()
+        {
+            while (true)
+            {
+                Account savingsAcc = null;
+                Account checkingAcc = null;
+                if (_loggedInCustomer.HasSavingsAccount())
+                {
+                    savingsAcc = _accountService.GetAccount("S", _loggedInCustomer);
+                }
+                if (_loggedInCustomer.HasCheckingAccount())
+                {
+                    checkingAcc = _accountService.GetAccount("C", _loggedInCustomer);
+                }
+
+                Console.Write(
+@$"--- Select Account ---
+
+Select an account to withdraw money from:
+
+1. Savings Account - {(savingsAcc != null ? savingsAcc.Balance : "Unavailable")}
+2. Checking Account - {(checkingAcc != null ? checkingAcc.Balance : "Unavailable")}
+3. Return to Main Menu");
+
+
+                var input = Console.ReadLine();
+                Console.WriteLine();
+
+                if (!int.TryParse(input, out int option) || !(option is >= 1 and <= 3))
+                {
+                    Console.WriteLine("Invalid input.");
+                    Console.WriteLine();
+                    continue;
+                }
+
+                switch (option)
+                {
+                    case 1:
+                        // DepositSavings
+                        if (_loggedInCustomer.HasSavingsAccount())
+                        {
+                            Withdraw(savingsAcc);
+                        }
+                        else
+                        {
+                            Console.WriteLine("You do not have a savings account.");
+                            continue;
+                        }
+                        break;
+                    case 2:
+                        // DepositChecking()
+                        if (_loggedInCustomer.HasCheckingAccount())
+                        {
+                            Withdraw(checkingAcc);
+                        }
+                        else
+                        {
+                            Console.WriteLine("You do not have a checking account.");
+                            continue;
+                        }
+                        break;
+                    case 3:
+                        DisplayMainMenu();
+                        break;
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+        }
+
+        private void DisplayAccountsForDeposit()
         {
             while (true)
             {
@@ -201,12 +271,21 @@ Select an account to deposit money into:
                         }
                         else
                         {
-                            Console.WriteLine("You do not have any savings account.");
+                            Console.WriteLine("You do not have a savings account.");
                             continue;
                         }
                         break;
                     case 2:
                         // DepositChecking()
+                        if (_loggedInCustomer.HasCheckingAccount())
+                        {
+                            Deposit(checkingAcc);
+                        }
+                        else
+                        {
+                            Console.WriteLine("You do not have a checking account.");
+                            continue;
+                        }
                         break;
                     case 3:
                         DisplayMainMenu();
@@ -214,6 +293,58 @@ Select an account to deposit money into:
                     default:
                         throw new InvalidOperationException();
                 }
+            }
+        }
+
+        private void Withdraw(Account account)
+        {
+            while (true)
+            {
+                Console.Write(
+@$"--- Withdraw Amount ---
+
+Your available balance is ${account.Balance}
+
+Enter the amount you would like to withdraw, or press enter to return : $");
+
+                var input = Console.ReadLine();
+                Console.WriteLine();
+                if (input == string.Empty)
+                {
+                    DisplayAccountsForWithdrawal();
+                }
+
+                if (!ValidateMoneyInput(input))
+                {
+                    Console.WriteLine($"Withdrawal of {input} failed.\nPress any key to continue\n");
+                    Console.ReadKey();
+                    DisplayAccountsForWithdrawal();
+                }
+                else
+                {
+                    try
+                    {
+                        _accountService.DeductBalanceAsync(account, decimal.Parse(input)).Wait();
+                        Console.WriteLine($"Withdrawal of ${input} was succesful");
+                    }
+                    catch (AggregateException e)
+                    {
+                        Console.WriteLine($"Withdrawing ${input} would overdraw the account. " +
+                            $"Checking account must have a minimum balance of $200.");
+                        Console.WriteLine(e.Message);
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+
+                    Console.WriteLine($"Your balance is now {account.Balance}");
+                    Console.WriteLine("Press any key to return to account selection menu.\n");
+                    Console.ReadKey();
+                    DisplayAccountsForWithdrawal();
+                    break;
+                }
+
             }
         }
 
@@ -228,19 +359,27 @@ Your available balance is ${account.Balance}
 
 Enter the amount you would like to deposit, or press enter to return : $");
 
+
                 var input = Console.ReadLine();
                 Console.WriteLine();
 
-                if (!ValidateDepositInput(input))
+                if (!ValidateMoneyInput(input))
                 {
                     Console.WriteLine($"Deposit of {input} failed.\nPress any key to continue\n");
                     Console.ReadKey();
-                    DisplayAccounts();
+                    DisplayAccountsForDeposit();
                 }
                 else
                 {
                     // Update DB
                     _accountService.AddBalanceAsync(account, balance: decimal.Parse(input)).Wait();
+
+                    Console.WriteLine($"Deposit of ${input} was succesful");
+                    Console.WriteLine($"Your balance is now {account.Balance}");
+                    Console.WriteLine("Press any key to return to account selection menu.\n");
+                    Console.ReadKey();
+                    DisplayAccountsForDeposit();
+                    break;
                 }
 
             }
@@ -288,7 +427,7 @@ Enter the amount you would like to deposit, or press enter to return : $");
             }
         }
 
-        private bool ValidateDepositInput(string input)
+        private bool ValidateMoneyInput(string input)
         {
             bool retVal;
             if (!decimal.TryParse(input, out decimal option))
@@ -313,5 +452,7 @@ Enter the amount you would like to deposit, or press enter to return : $");
             return retVal;
         }
 
+
     }
+
 }
