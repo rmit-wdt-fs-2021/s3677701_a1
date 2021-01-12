@@ -191,15 +191,7 @@ Please select an option from the following:
                     checkingAcc = _accountService.GetAccount("C", _loggedInCustomer);
                 }
 
-                Console.Write(
-@$"--- Select Account ---
-
-Select an account to withdraw money from:
-
-1. Savings Account - {(savingsAcc != null ? savingsAcc.Balance : "Unavailable")}
-2. Checking Account - {(checkingAcc != null ? checkingAcc.Balance : "Unavailable")}
-3. Return to Main Menu");
-
+                AccountSelectionMenu("Select an account to withdraw money from", savingsAcc, checkingAcc);
 
                 var input = Console.ReadLine();
                 Console.WriteLine();
