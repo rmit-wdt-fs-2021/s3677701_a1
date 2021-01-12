@@ -23,6 +23,8 @@ namespace InternetBankingApp.Managers
             using var connection = _connectionString.CreateConnection();
             SqlCommand command = connection.CreateCommand();
             command.CommandText = "select * from Account";
+
+            var transactionManager = new TransactionManagerProxy(_connectionString);
             Accounts = command.GetDataTable().Select().Select(x => new Account
             {
                 AccountNumber = (int)x["AccountNumber"],

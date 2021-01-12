@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InternetBankingApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,6 @@ namespace InternetBankingApp.Interfaces
 {
     public interface ITransactionManager
     {
+        Task InsertTransactionAsync(Transaction transaction);
     }
 }
