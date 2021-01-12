@@ -36,8 +36,8 @@ namespace InternetBankingApp
             {
                 // TODO replace dude with name
                 Console.Write(
- @"----- Main Menu ----
-Welcome dude
+ @$"----- Main Menu ----
+Welcome {_loggedInCustomer.Name}
 
 Please select an option from the following:
    
@@ -99,14 +99,13 @@ Please enter your Login Id: ");
                 Console.WriteLine();
                 if (_loginService.AuthenticateUser(loginIDInput, passwordInput))
                 {
-                    Console.WriteLine("Logged in successfully");
                     var customerID = _loginService.GetCustomerIDFromLogin(loginIDInput);
                     _loggedInCustomer = _customerService.GetCustomer(customerID);
                     DisplayMainMenu();
                 }
                 else
                 {
-                    Console.WriteLine("Incorrect loginID or password");
+                    Console.WriteLine("Incorrect loginID or password\n");
                     continue;
                 }
 
@@ -157,14 +156,14 @@ Please select an option from the following:
         public void DisplayAccounts()
         {
             while (true)
-            {
+            {   // TODO : Figure out how to get balance.
                 Console.Write(
 @$"--- Select Account ---
 
 Select an account to deposit money into:
 
-1. Savings Account - {(_loggedInCustomer.HasSavingsAccount() ? "122" : "0")}
-2. Checking Account - {(_loggedInCustomer.HasCheckingAccount() ? "100" : "0")}
+1. Savings Account - {(_loggedInCustomer.HasSavingsAccount() ? "122" : "Unavailable")}
+2. Checking Account - {(_loggedInCustomer.HasCheckingAccount() ? "100" : "Unavailable")}
 3. Return to Main Menu");
 
 

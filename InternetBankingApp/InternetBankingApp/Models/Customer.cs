@@ -12,6 +12,7 @@ namespace InternetBankingApp.Models
   
         public string Name { get; set; }
 
+        // Property type is object as to cater for DBNull value.
         public object Address { get; set; }
 
         public object City { get; set; }

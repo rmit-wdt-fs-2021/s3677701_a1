@@ -1,6 +1,7 @@
 ﻿using InternetBankingApp.Interfaces;
 using InternetBankingApp.Models;
 using InternetBankingApp.Utilities;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace InternetBankingApp.Managers
             else
             {
                 using var connection = _connectionString.CreateConnection();
-                var command = connection.CreateCommand();
+                SqlCommand command = connection.CreateCommand();
                 command.CommandText = "select * from Customer";
 
                 var accountManager = new AccountManager(_connectionString); 

@@ -42,12 +42,12 @@ namespace InternetBankingApp.Services
             return logins;
         }
 
-        public void InsertLogins()
+        public async Task InsertLoginsAsync()
         {
-            var logins = GetLoginsAsync().Result;
+            var logins = await GetLoginsAsync();
             foreach (var login in logins)
             {
-                _loginManager.InsertLoginAsync(login);
+                await _loginManager.InsertLoginAsync(login);
             }
         }
     }

@@ -36,20 +36,20 @@ namespace InternetBankingApp.Services
             return customers;
         }
 
-        public void InsertCustomers(string connectionString)
+        public async Task InsertCustomersAsync(string connectionString)
         {
-            var customers = GetCustomersAsync().Result;
+            var customers = await GetCustomersAsync();
 
             var customerManager = new CustomerManagerProxy(connectionString);
             var accountManager = new AccountManager(connectionString);
             foreach (var customer in customers)
             {
-                customerManager.InsertCustomerAsync(customer);
+                await customerManager.InsertCustomerAsync(customer);
 
                 foreach(var account in customer.Accounts)
                 {
                     account.CustomerID = customer.CustomerID;
-                    accountManager.InsertAccountAsync(account);
+                    await accountManager.InsertAccountAsync(account);
                 }
             }
         }
