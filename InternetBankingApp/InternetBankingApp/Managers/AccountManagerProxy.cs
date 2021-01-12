@@ -30,11 +30,12 @@ namespace InternetBankingApp.Managers
                 AccountNumber = (int)x["AccountNumber"],
                 AccountType = (string)x["AccountType"], //TODO make enum?
                 CustomerID = (int)x["CustomerID"],
-                Balance = (decimal)x["Balance"]
-                //Transactions
+                Balance = (decimal)x["Balance"],
+                Transactions = transactionManager.GetTransactions((int)x["CustomerID"])
             }).ToList();
 
         }
+
         public List<Account> GetAccounts(int customerID)
         {
             return Accounts.Where(x => x.CustomerID == customerID).ToList();

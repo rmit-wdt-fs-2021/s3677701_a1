@@ -63,5 +63,10 @@ namespace InternetBankingApp.Managers
 
             await cmd.ExecuteNonQueryAsync();
         }
+
+        public List<Customer> GetAllCustomers()
+        {
+            return Customers;
+        }
     }
 }

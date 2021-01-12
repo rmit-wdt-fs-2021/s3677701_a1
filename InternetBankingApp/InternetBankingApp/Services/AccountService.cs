@@ -52,6 +52,14 @@ namespace InternetBankingApp.Services
             }
         }
 
+        public async Task InsertAccountsAsync(List<Account> accounts)
+        {
+            foreach(var account in accounts)
+            {
+                await _accountManager.InsertAccountAsync(account);
+            }
+        }
+
         private bool ValidateWithdrawal(Account account, decimal balance)
         {
             bool retVal = true;

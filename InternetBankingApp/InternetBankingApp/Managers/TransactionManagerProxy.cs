@@ -21,17 +21,23 @@ namespace InternetBankingApp.Managers
 
             using var connection = _connectionString.CreateConnection();
             var command = connection.CreateCommand();
-            command.CommandText = "select * from Transaction";
+            command.CommandText = "select * from [Transaction]";
 
             Transactions = command.GetDataTable().Select().Select(x => new Transaction
             {
                 TransactionID = (int)x["TransactionID"],
+                TransactionType = (string)x["TransactionType"],
                 AccountNumber = (int)x["AccountNumber"],
-                DestinationAccountNumber = (int)x["DestinationAccountNumber"],
+                DestinationAccountNumber = Convert.IsDBNull(x["DestinationAccountNumber"]) ? null : (int?)x["DestinationAccountNumber"],
                 Amount = (decimal)x["Amount"],
                 Comment = (object)x["Comment"],
-                TransactionTimeUtc = (string)["TransactionTimeUtc"]
+                TransactionTimeUtc = (DateTime)x["TransactionTimeUtc"]
             }).ToList();
+        }
+
+        public List<Transaction> GetTransactions(int accountNumber)
+        {
+            return Transactions.Where(x => x.AccountNumber == accountNumber).ToList();
         }
 
         public async Task InsertTransactionAsync(Transaction transaction)
@@ -46,12 +52,12 @@ namespace InternetBankingApp.Managers
 
             var command = connection.CreateCommand();
             command.CommandText =
-                "insert into Transaction (TransactionID, TransactionType, AccountNumber, DestinationAccountNumber, Amount, Comment, TransactionTimeUtc)" +
-                "values (@transactionID, @transactionType, @accountNumber, @destinationAccountNumber, @amount, @comment, @transactionTimeUtc)";
-            command.Parameters.AddWithValue("transactionID", transaction.TransactionID);
+                "insert into [Transaction] (TransactionType, AccountNumber, DestinationAccountNumber, Amount, Comment, TransactionTimeUtc)" +
+                "values (@transactionType, @accountNumber, @destinationAccountNumber, @amount, @comment, @transactionTimeUtc)";
+            //command.Parameters.AddWithValue("transactionID", transaction.TransactionID);
             command.Parameters.AddWithValue("transactionType", transaction.TransactionType);
             command.Parameters.AddWithValue("AccountNumber", transaction.AccountNumber);
-            command.Parameters.AddWithValue("DestinationAccountNumber", transaction.DestinationAccountNumber);
+            command.Parameters.AddWithValue("DestinationAccountNumber", transaction.DestinationAccountNumber is null ? DBNull.Value : transaction.DestinationAccountNumber);
             command.Parameters.AddWithValue("Amount", transaction.Amount);
             command.Parameters.AddWithValue("Comment", transaction.Comment ?? DBNull.Value);
             command.Parameters.AddWithValue("TransactionTimeUtc", transaction.TransactionTimeUtc);
