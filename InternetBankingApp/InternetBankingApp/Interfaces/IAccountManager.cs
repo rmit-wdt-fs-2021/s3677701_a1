@@ -8,5 +8,6 @@ namespace InternetBankingApp.Interfaces
     {
         public List<Account> GetAccounts(int customerID);
         public Task InsertAccountAsync(Account account);
+        Task UpdateAccountBalanceAsync(Account account);
     }
 }

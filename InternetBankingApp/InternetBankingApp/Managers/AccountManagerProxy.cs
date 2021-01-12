@@ -15,6 +15,7 @@ namespace InternetBankingApp.Managers
         private readonly string _connectionString;
         
         public List<Account> Accounts { get; }
+
         public AccountManagerProxy(string connectionString)
         {
             _connectionString = connectionString;
@@ -56,6 +57,25 @@ namespace InternetBankingApp.Managers
             command.Parameters.AddWithValue("Balance", account.Balance);
 
             await command.ExecuteNonQueryAsync();
+        }
+
+        public async Task UpdateAccountBalanceAsync(Account account)
+        {
+            if (account is null)
+            {
+                throw new ArgumentNullException(nameof(account));
+            }
+
+            using var connection = _connectionString.CreateConnection();
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = "update Account set Balance = @balance where AccountNumber = @accountNumber";
+            command.Parameters.AddWithValue("balance", account.Balance);
+            command.Parameters.AddWithValue("accountNumber", account.AccountNumber);
+
+            await command.ExecuteNonQueryAsync();
+            // TODO : err handle if update not successful
         }
     }
 }

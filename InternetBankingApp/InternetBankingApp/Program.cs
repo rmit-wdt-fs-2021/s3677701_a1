@@ -17,7 +17,7 @@ namespace InternetBankingApp
             var loginService = new LoginService(connectionString);
             loginService.InsertLoginsAsync().Wait();
 
-            var accountService = new AccountService();
+            var accountService = new AccountService(connectionString);
             var menu = new Menu(loginService, customerService, accountService);
         }
     }

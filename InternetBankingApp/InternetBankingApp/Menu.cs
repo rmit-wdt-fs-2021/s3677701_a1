@@ -156,7 +156,7 @@ Please select an option from the following:
             }
         }
 
-        public void DisplayAccounts()
+        private void DisplayAccounts()
         {
             while (true)
             {
@@ -166,7 +166,7 @@ Please select an option from the following:
                 {
                     savingsAcc = _accountService.GetAccount("S", _loggedInCustomer);
                 }
-                else
+                if (_loggedInCustomer.HasCheckingAccount())
                 {
                     checkingAcc = _accountService.GetAccount("C", _loggedInCustomer);
                 }
@@ -228,35 +228,24 @@ Your available balance is ${account.Balance}
 
 Enter the amount you would like to deposit, or press enter to return : $");
 
+                var input = Console.ReadLine();
+                Console.WriteLine();
+
+                if (!ValidateDepositInput(input))
+                {
+                    Console.WriteLine($"Deposit of {input} failed.\nPress any key to continue\n");
+                    Console.ReadKey();
+                    DisplayAccounts();
+                }
+                else
+                {
+                    // Update DB
+                    _accountService.AddBalanceAsync(account, balance: decimal.Parse(input)).Wait();
+                }
 
             }
         }
 
-        public void DepositSavings()
-        {
-            // Show balance
-        }
-
-        public void DisplayBalance()
-        {
-
-        }
-
-
-        public void DisplayDeposit()
-        {
-            Console.Write(
-@"--- Deposit Amount ----
-
-Your available balance is ${}
-
-Enter the amount you would like to deposit, or press enter to return : $");
-
-            var input = Console.ReadLine();
-            Console.WriteLine();
-
-            
-        }
 
         /// <summary>
         /// Hides users inputted keys.
@@ -301,10 +290,27 @@ Enter the amount you would like to deposit, or press enter to return : $");
 
         private bool ValidateDepositInput(string input)
         {
-            if (!int.TryParse(input, out int option)){
-                Console.WriteLine("Invalid input.")
-                return false;
+            bool retVal;
+            if (!decimal.TryParse(input, out decimal option))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number.");
+                Console.WriteLine();
+                retVal = false;
             }
+            else
+            {
+                if (option > 0)
+                {
+                    retVal = true;
+                }
+                else
+                {
+                    Console.WriteLine("Cannot deposit 0 or negative number");
+                    retVal = false;
+                }
+            }
+
+            return retVal;
         }
 
     }

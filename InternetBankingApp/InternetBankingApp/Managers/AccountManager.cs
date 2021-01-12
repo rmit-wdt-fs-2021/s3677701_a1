@@ -47,5 +47,18 @@ namespace InternetBankingApp.Managers
 
             await command.ExecuteNonQueryAsync();
         }
+
+        public async Task UpdateAccountBalanceAsync(Account account)
+        {
+            using var connection = _connectionString.CreateConnection();
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = "update Account set Balance = @balance where AccountNumber = @accountNumber";
+            command.Parameters.AddWithValue("balance", account.Balance);
+            command.Parameters.AddWithValue("accountNumber", account.AccountNumber);
+
+            await command.ExecuteNonQueryAsync();
+        }
     }
 }
