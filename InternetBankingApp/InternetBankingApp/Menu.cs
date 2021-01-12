@@ -70,6 +70,7 @@ Enter an option: ");
                         DisplayATMMenu();
                         break;
                     case MenuChoice.Transfer:
+                        DisplayTransferMenu();
                         break;
                     case MenuChoice.MyStatements:
                         break;
@@ -83,6 +84,25 @@ Enter an option: ");
                     default:
                         throw new InvalidOperationException();
                 }
+            }
+        }
+
+        private void DisplayTransferMenu()
+        {
+            Account savingsAcc = null;
+            Account checkingAcc = null;
+            if (_loggedInCustomer.HasSavingsAccount())
+            {
+                savingsAcc = _accountService.GetAccount("S", _loggedInCustomer);
+            }
+            if (_loggedInCustomer.HasCheckingAccount())
+            {
+                checkingAcc = _accountService.GetAccount("C", _loggedInCustomer);
+            }
+
+            while (true)
+            {
+                AccountSelectionMenu("Select an account to transfer money from", savingsAcc, checkingAcc);
             }
         }
 
@@ -116,7 +136,7 @@ Please enter your Login Id: ");
             }
         }
 
-        public void DisplayATMMenu()
+        private void DisplayATMMenu()
         {
             while (true)
             {
@@ -226,30 +246,34 @@ Select an account to withdraw money from:
             }
         }
 
-        private void DisplayAccountsForDeposit()
+        private void AccountSelectionMenu(string message, Account savingsAcc, Account checkingAcc)
         {
-            while (true)
-            {
-                Account savingsAcc = null;
-                Account checkingAcc = null;
-                if (_loggedInCustomer.HasSavingsAccount())
-                {
-                    savingsAcc = _accountService.GetAccount("S", _loggedInCustomer);
-                }
-                if (_loggedInCustomer.HasCheckingAccount())
-                {
-                    checkingAcc = _accountService.GetAccount("C", _loggedInCustomer);
-                }
-
-                Console.Write(
+            Console.Write(
 @$"--- Select Account ---
 
-Select an account to deposit money into:
+{message}:
 
 1. Savings Account - {(savingsAcc != null ? savingsAcc.Balance : "Unavailable")}
 2. Checking Account - {(checkingAcc != null ? checkingAcc.Balance : "Unavailable")}
 3. Return to Main Menu");
+        }
 
+        private void DisplayAccountsForDeposit()
+        {
+            Account savingsAcc = null;
+            Account checkingAcc = null;
+            if (_loggedInCustomer.HasSavingsAccount())
+            {
+                savingsAcc = _accountService.GetAccount("S", _loggedInCustomer);
+            }
+            if (_loggedInCustomer.HasCheckingAccount())
+            {
+                checkingAcc = _accountService.GetAccount("C", _loggedInCustomer);
+            }
+
+            while (true)
+            {
+                AccountSelectionMenu("Select an account to deposit money to", savingsAcc, checkingAcc);
 
                 var input = Console.ReadLine();
                 Console.WriteLine();
@@ -333,7 +357,7 @@ Enter the amount you would like to withdraw, or press enter to return : $");
                             $"Checking account must have a minimum balance of $200.");
                         Console.WriteLine(e.Message);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
                     }
