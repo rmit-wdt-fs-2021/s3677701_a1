@@ -14,56 +14,38 @@ namespace InternetBankingApp.Managers
     {
         private readonly string _connectionString;
 
-        private List<Customer> _customers;
+        public List<Customer> Customers { get; }
 
         public CustomerManagerProxy(string connectionString)
         {
             _connectionString = connectionString;
-            _customers = new List<Customer>();
+
+            using var connection = _connectionString.CreateConnection();
+            SqlCommand command = connection.CreateCommand();
+            command.CommandText = "select * from Customer";
+
+            var accountManager = new AccountManager(_connectionString);
+
+            Customers = command.GetDataTable().Select().Select(x => new Customer
+            {
+                CustomerID = (int)x["CustomerID"],
+                Name = (string)x["Name"],
+                Address = x["Address"],
+                City = x["City"],
+                PostCode = x["PostCode"],
+                Accounts = accountManager.GetAccounts((int)x["CustomerID"])
+            }).ToList();
         }
 
         public Customer GetCustomer(int customerID)
         {
-            if (_customers.Any())
-            {
-                return _customers.FirstOrDefault(x => x.CustomerID == customerID);
-            }
-
-            return GetAllCustomers().FirstOrDefault(x => x.CustomerID == customerID);
+            return Customers.FirstOrDefault(x => x.CustomerID == customerID);
         }
 
-        public List<Customer> GetAllCustomers()
-        {
-            if (_customers.Any())
-            {
-                return _customers;
-            }
-            else
-            {
-                using var connection = _connectionString.CreateConnection();
-                SqlCommand command = connection.CreateCommand();
-                command.CommandText = "select * from Customer";
-
-                var accountManager = new AccountManager(_connectionString); 
-              
-                    _customers = command.GetDataTable().Select().Select(x => new Customer
-                    {
-                        CustomerID = (int)x["CustomerID"],
-                        Name = (string)x["Name"],
-                        Address = x["Address"],
-                        City = x["City"],
-                        PostCode = x["PostCode"],
-                        Accounts = accountManager.GetAccounts((int)x["CustomerID"])
-                    }).ToList();
-                
-
-                return _customers;
-            }
-        }
 
         public async Task InsertCustomerAsync(Customer customer)
         {
-            if (_customers.Any())
+            if (Customers.Any())
             {
                 return;
             }
