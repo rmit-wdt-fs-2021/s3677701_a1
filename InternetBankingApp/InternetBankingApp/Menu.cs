@@ -1,6 +1,7 @@
 ﻿using InternetBankingApp.Interfaces;
 using InternetBankingApp.Models;
 using InternetBankingApp.Services;
+using InternetBankingApp.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,11 +23,13 @@ namespace InternetBankingApp
     {
         private readonly ILoginService _loginService;
         private readonly ICustomerService _customerService;
+        private readonly IAccountService _accountService;
         private Customer _loggedInCustomer;
-        public Menu(LoginService loginService, CustomerService customerService)
+        public Menu(LoginService loginService, CustomerService customerService, AccountService accountService)
         {
             _loginService = loginService;
             _customerService = customerService;
+            _accountService = accountService;
             DisplayLogin();
         }
 
@@ -51,13 +54,13 @@ Enter an option: ");
                 var input = Console.ReadLine();
                 Console.WriteLine();
 
-                if (!int.TryParse(input, out int option) || !(option is >=1 and <=5) )
+                if (!int.TryParse(input, out int option) || !(option is >= 1 and <= 5))
                 {
                     Console.WriteLine("Invalid input. Please re-enter your selection.");
                     Console.WriteLine();
                     continue;
                 }
-                
+
                 MenuChoice choice = (MenuChoice)option;
 
                 switch (choice)
@@ -156,14 +159,25 @@ Please select an option from the following:
         public void DisplayAccounts()
         {
             while (true)
-            {   // TODO : Figure out how to get balance.
+            {
+                Account savingsAcc = null;
+                Account checkingAcc = null;
+                if (_loggedInCustomer.HasSavingsAccount())
+                {
+                    savingsAcc = _accountService.GetAccount("S", _loggedInCustomer);
+                }
+                else
+                {
+                    checkingAcc = _accountService.GetAccount("C", _loggedInCustomer);
+                }
+
                 Console.Write(
 @$"--- Select Account ---
 
 Select an account to deposit money into:
 
-1. Savings Account - {(_loggedInCustomer.HasSavingsAccount() ? "122" : "Unavailable")}
-2. Checking Account - {(_loggedInCustomer.HasCheckingAccount() ? "100" : "Unavailable")}
+1. Savings Account - {(savingsAcc != null ? savingsAcc.Balance : "Unavailable")}
+2. Checking Account - {(checkingAcc != null ? checkingAcc.Balance : "Unavailable")}
 3. Return to Main Menu");
 
 
@@ -181,6 +195,15 @@ Select an account to deposit money into:
                 {
                     case 1:
                         // DepositSavings
+                        if (_loggedInCustomer.HasSavingsAccount())
+                        {
+                            Deposit(savingsAcc);
+                        }
+                        else
+                        {
+                            Console.WriteLine("You do not have any savings account.");
+                            continue;
+                        }
                         break;
                     case 2:
                         // DepositChecking()
@@ -191,6 +214,21 @@ Select an account to deposit money into:
                     default:
                         throw new InvalidOperationException();
                 }
+            }
+        }
+
+        private void Deposit(Account account)
+        {
+            while (true)
+            {
+                Console.Write(
+@$"--- Deposit Amount ---
+
+Your available balance is ${account.Balance}
+
+Enter the amount you would like to deposit, or press enter to return : $");
+
+
             }
         }
 
@@ -214,6 +252,10 @@ Your available balance is ${}
 
 Enter the amount you would like to deposit, or press enter to return : $");
 
+            var input = Console.ReadLine();
+            Console.WriteLine();
+
+            
         }
 
         /// <summary>
@@ -221,7 +263,7 @@ Enter the amount you would like to deposit, or press enter to return : $");
         /// Referenced from : https://dotnetcodr.com/2015/09/02/how-to-hide-the-text-entered-in-a-net-console-application/
         /// </summary>
         /// <returns>Hidden string input.</returns>
-        private string GetPasswordFromInput()
+        private static string GetPasswordFromInput()
         {
             var passwordBuilder = new StringBuilder();
             bool continueReading = true;
@@ -243,6 +285,27 @@ Enter the amount you would like to deposit, or press enter to return : $");
             return passwordBuilder.ToString();
         }
 
+        private bool ValidateMenuInput(string input, int maxRange)
+        {
+            if (!int.TryParse(input, out int option) || !option.IsInRange(1, maxRange))
+            {
+                Console.WriteLine("Invalid input.");
+                Console.WriteLine();
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        private bool ValidateDepositInput(string input)
+        {
+            if (!int.TryParse(input, out int option)){
+                Console.WriteLine("Invalid input.")
+                return false;
+            }
+        }
 
     }
 }

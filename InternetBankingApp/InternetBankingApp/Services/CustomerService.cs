@@ -12,10 +12,12 @@ namespace InternetBankingApp.Services
     public class CustomerService : ICustomerService
     {
         private readonly ICustomerManager _customerManager;
+        private readonly IAccountManager _accountManager;
 
         public CustomerService(string connectionString)
         {
             _customerManager = new CustomerManagerProxy(connectionString);
+            _accountManager = new AccountManagerProxy(connectionString);
         }
 
         public Customer GetCustomer(int customerID)
@@ -36,20 +38,17 @@ namespace InternetBankingApp.Services
             return customers;
         }
 
-        public async Task InsertCustomersAsync(string connectionString)
+        public async Task InsertCustomersAsync()
         {
             var customers = await GetCustomersAsync();
-
-            var customerManager = new CustomerManagerProxy(connectionString);
-            IAccountManager accountManager = new AccountManagerProxy(connectionString);
             foreach (var customer in customers)
             {
-                await customerManager.InsertCustomerAsync(customer);
+                await _customerManager.InsertCustomerAsync(customer);
 
                 foreach(var account in customer.Accounts)
                 {
                     account.CustomerID = customer.CustomerID;
-                    await accountManager.InsertAccountAsync(account);
+                    await _accountManager.InsertAccountAsync(account);
                 }
             }
         }

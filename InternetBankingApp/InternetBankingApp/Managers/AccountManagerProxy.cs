@@ -34,22 +34,16 @@ namespace InternetBankingApp.Managers
         }
         public List<Account> GetAccounts(int customerID)
         {
-            using var connection = _connectionString.CreateConnection();
-            var command = connection.CreateCommand();
-            command.CommandText = "select * from Account where CustomerID = @customerID";
-            command.Parameters.AddWithValue("customerID", customerID);
-
-            return command.GetDataTable().Select().Select(x => new Account
-            {
-                AccountNumber = (int)x["AccountNumber"],
-                AccountType = (string)x["AccountType"],
-                CustomerID = (int)x["CustomerID"],
-                Balance = (decimal)x["Balance"]
-            }).ToList();
+            return Accounts.Where(x => x.CustomerID == customerID).ToList();
         }
 
         public async Task InsertAccountAsync(Account account)
         {
+            if (Accounts.Any())
+            {
+                return;
+            }
+
             using var connection = _connectionString.CreateConnection();
             connection.Open();
 

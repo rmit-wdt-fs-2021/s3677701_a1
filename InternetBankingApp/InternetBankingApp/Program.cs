@@ -1,4 +1,5 @@
-﻿using InternetBankingApp.Managers;
+﻿using InternetBankingApp.Interfaces;
+using InternetBankingApp.Managers;
 using InternetBankingApp.Services;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -12,10 +13,12 @@ namespace InternetBankingApp
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
             var connectionString = configuration["ConnectionString"];
             var customerService = new CustomerService(connectionString);
-            customerService.InsertCustomersAsync(connectionString).Wait();
+            customerService.InsertCustomersAsync().Wait();
             var loginService = new LoginService(connectionString);
             loginService.InsertLoginsAsync().Wait();
-            //var menu = new Menu(loginService, customerService);
+
+            var accountService = new AccountService();
+            var menu = new Menu(loginService, customerService, accountService);
         }
     }
 }
