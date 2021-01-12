@@ -89,6 +89,7 @@ Enter an option: ");
 
         private void DisplayTransferMenu()
         {
+            //TODO : refactor this.
             Account savingsAcc = null;
             Account checkingAcc = null;
             if (_loggedInCustomer.HasSavingsAccount())
@@ -103,6 +104,66 @@ Enter an option: ");
             while (true)
             {
                 AccountSelectionMenu("Select an account to transfer money from", savingsAcc, checkingAcc);
+
+                var input = Console.ReadLine();
+                Console.WriteLine();
+
+                if (!int.TryParse(input, out int option) || !(option is >= 1 and <= 3))
+                {
+                    Console.WriteLine("Invalid input.");
+                    Console.WriteLine();
+                    continue;
+                }
+
+                switch (option)
+                {
+                    case 1:
+                        Transfer(savingsAcc);
+                        break;
+                }
+            }
+        }
+
+        private void Transfer(Account srcAccount)
+        {
+
+            while (true) {
+                Console.Write("Enter the account number you wish to transfer to, or press enter to return to the account selection menu : ");
+                var input = Console.ReadLine();
+                Console.WriteLine();
+                if (input == string.Empty)
+                {
+                    DisplayTransferMenu();
+                    break;
+                }
+
+                // Account number will always be 4 digits.
+                if (!int.TryParse(input, out int accountNumber) || (input.Length != 4))
+                {
+                    Console.WriteLine("Invalid input. Please re-enter account number.");
+                    Console.WriteLine();
+                    continue;
+                }
+
+                Console.Write(
+@$"--- Transfer Amount ---
+
+Your available balance is ${srcAccount.Balance}
+
+Enter the amount you would like to transfer to account {accountNumber}, or press enter to return to the account selection menu: $");
+
+                var transferInput = Console.ReadLine();
+                Console.WriteLine();
+                if (transferInput == string.Empty)
+                {
+                    DisplayTransferMenu();
+                    break;
+                }
+
+                Console.Write("Please add a description (optional): ");
+                var desc = Console.ReadLine();
+
+
             }
         }
 
@@ -245,8 +306,8 @@ Please select an option from the following:
 
 {message}:
 
-1. Savings Account - {(savingsAcc != null ? savingsAcc.Balance : "Unavailable")}
-2. Checking Account - {(checkingAcc != null ? checkingAcc.Balance : "Unavailable")}
+1. Savings Account - {(savingsAcc != null ? savingsAcc.AccountNumber : "Unavailable")}
+2. Checking Account - {(checkingAcc != null ? checkingAcc.AccountNumber : "Unavailable")}
 3. Return to Main Menu");
         }
 
