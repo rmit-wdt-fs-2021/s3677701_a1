@@ -12,7 +12,7 @@ namespace InternetBankingApp.Models
   
         public string Name { get; set; }
 
-        // Property type is object as to cater for DBNull value.
+        // TODO : Property type is object as to cater for DBNull value.
         public object Address { get; set; }
 
         public object City { get; set; }
@@ -20,6 +20,10 @@ namespace InternetBankingApp.Models
         public object PostCode { get; set; }
 
         public IList<Account> Accounts { get; set; }
+
+        public Account SavingsAccount => Accounts.First(x => x.AccountType == "S");
+
+        public Account CheckingAccount => Accounts.First(x => x.AccountType == "C");
 
         public bool HasSavingsAccount() => Accounts.Any(x => x.AccountType == "S");
 

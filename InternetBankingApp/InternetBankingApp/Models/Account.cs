@@ -18,5 +18,11 @@ namespace InternetBankingApp.Models
         public decimal Balance { get; set; }
 
         public IList<Transaction> Transactions { get; set; }
+
+        private const int FreeTransactions = 4;
+
+        public int AccountTransactions { get; set; } = 0;
+
+        public bool HasFreeTransaction => AccountTransactions <= FreeTransactions;
     }
 }

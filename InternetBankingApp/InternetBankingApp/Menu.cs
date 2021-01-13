@@ -29,6 +29,9 @@ namespace InternetBankingApp
 
         private Customer _loggedInCustomer;
 
+        private const string UnavailableSavingsAcc = "You do not have a savings account.";
+        private const string UnavailableCheckingAcc = "You do not have a checking account.";
+
         public Menu(LoginService loginService, CustomerService customerService, AccountService accountService, TransactionService transactionService)
         {
             _loginService = loginService;
@@ -76,6 +79,7 @@ Enter an option: ");
                         DisplayTransferMenu();
                         break;
                     case MenuChoice.MyStatements:
+                        DisplayStatementsMenu();
                         break;
                     case MenuChoice.Logout:
                         Console.WriteLine("Logging out..");
@@ -83,6 +87,52 @@ Enter an option: ");
                     case MenuChoice.Exit:
                         Console.WriteLine("Closing app..");
                         Environment.Exit(0);
+                        break;
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+        }
+
+        private void DisplayStatementsMenu()
+        {
+            while (true)
+            {
+                AccountSelectionMenu("Select an account to display the statement for", _loggedInCustomer.SavingsAccount, _loggedInCustomer.CheckingAccount);
+                var input = Console.ReadLine();
+                Console.WriteLine();
+
+                if (!int.TryParse(input, out int option) || !(option is >= 1 and <= 3))
+                {
+                    Console.WriteLine("Invalid input.");
+                    Console.WriteLine();
+                    continue;
+                }
+
+                switch (option)
+                {
+                    case 1:
+                        if (_loggedInCustomer.HasSavingsAccount())
+                        {
+                            // DisplayStatement
+                        }
+                        else
+                        {
+                            Console.Write(UnavailableSavingsAcc);
+                        }
+                        break;
+                    case 2:
+                        if (_loggedInCustomer.HasCheckingAccount())
+                        {
+                            Transfer(_loggedInCustomer.CheckingAccount);
+                        }
+                        else
+                        {
+                            Console.WriteLine(UnavailableCheckingAcc);
+                        }
+                        break;
+                    case 3:
+                        DisplayMainMenu();
                         break;
                     default:
                         throw new InvalidOperationException();
@@ -121,8 +171,30 @@ Enter an option: ");
                 switch (option)
                 {
                     case 1:
-                        Transfer(savingsAcc);
+                        if (_loggedInCustomer.HasSavingsAccount())
+                        {
+                            Transfer(_loggedInCustomer.SavingsAccount);
+                        }
+                        else
+                        {
+                            Console.Write(UnavailableSavingsAcc);
+                        }
                         break;
+                    case 2:
+                        if (_loggedInCustomer.HasCheckingAccount())
+                        {
+                            Transfer(_loggedInCustomer.CheckingAccount);
+                        }
+                        else
+                        {
+                            Console.WriteLine(UnavailableCheckingAcc);
+                        }
+                        break;
+                    case 3:
+                        DisplayMainMenu();
+                        break;
+                    default:
+                        throw new InvalidOperationException();
                 }
             }
         }
@@ -189,9 +261,10 @@ Enter the amount you would like to transfer to account {accountNumber}, or press
                 var desc = Console.ReadLine();
                 Console.WriteLine();
                 // Update DB
-                _transactionService.AddTransactionAsync("T", srcAccount.AccountNumber, decimal.Parse(transferInput), DateTime.UtcNow, accountNumber, comment: desc).Wait();
+                var amt = decimal.Parse(transferInput);
+                _transactionService.AddTransactionAsync("T", srcAccount.AccountNumber, amt, DateTime.UtcNow, accountNumber, comment: desc).Wait();
 
-                Console.WriteLine($"Your balance is now {srcAccount.Balance}");
+                Console.WriteLine($"Your balance is now ${srcAccount.Balance - amt}");
                 Console.WriteLine("Press any key to return to the account selection menu.");
                 Console.ReadKey();
                 AccountSelectionMenu("Select an account to transfer money from", savingsAcc, checkingAcc);
@@ -273,18 +346,18 @@ Please select an option from the following:
         {
             while (true)
             {
-                Account savingsAcc = null;
-                Account checkingAcc = null;
-                if (_loggedInCustomer.HasSavingsAccount())
-                {
-                    savingsAcc = _accountService.GetAccount("S", _loggedInCustomer);
-                }
-                if (_loggedInCustomer.HasCheckingAccount())
-                {
-                    checkingAcc = _accountService.GetAccount("C", _loggedInCustomer);
-                }
+                //Account savingsAcc = null;
+                //Account checkingAcc = null;
+                //if (_loggedInCustomer.HasSavingsAccount())
+                //{
+                //    savingsAcc = _accountService.GetAccount("S", _loggedInCustomer);
+                //}
+                //if (_loggedInCustomer.HasCheckingAccount())
+                //{
+                //    checkingAcc = _accountService.GetAccount("C", _loggedInCustomer);
+                //}
 
-                AccountSelectionMenu("Select an account to withdraw money from", savingsAcc, checkingAcc);
+                AccountSelectionMenu("Select an account to withdraw money from", _loggedInCustomer.SavingsAccount, _loggedInCustomer.CheckingAccount);
 
                 var input = Console.ReadLine();
                 Console.WriteLine();
@@ -302,7 +375,7 @@ Please select an option from the following:
                         // DepositSavings
                         if (_loggedInCustomer.HasSavingsAccount())
                         {
-                            Withdraw(savingsAcc);
+                            Withdraw(_loggedInCustomer.SavingsAccount);
                         }
                         else
                         {
@@ -314,7 +387,7 @@ Please select an option from the following:
                         // DepositChecking()
                         if (_loggedInCustomer.HasCheckingAccount())
                         {
-                            Withdraw(checkingAcc);
+                            Withdraw(_loggedInCustomer.CheckingAccount);
                         }
                         else
                         {
@@ -333,7 +406,7 @@ Please select an option from the following:
 
         private void AccountSelectionMenu(string message, Account savingsAcc, Account checkingAcc)
         {
-            Console.Write(
+            Console.WriteLine(
 @$"--- Select Account ---
 
 {message}:
@@ -447,6 +520,9 @@ Enter the amount you would like to withdraw, or press enter to return : $");
                         Console.WriteLine(e.Message);
                     }
 
+                    _transactionService.AddTransactionAsync("W", account.AccountNumber, decimal.Parse(input), DateTime.UtcNow).Wait();
+                    _transactionService.AddTransactionAsync("S", account.AccountNumber, 0M, DateTime.UtcNow).Wait();
+
                     Console.WriteLine($"Your balance is now {account.Balance}");
                     Console.WriteLine("Press any key to return to account selection menu.\n");
                     Console.ReadKey();
@@ -471,6 +547,10 @@ Enter the amount you would like to deposit, or press enter to return : $");
 
                 var input = Console.ReadLine();
                 Console.WriteLine();
+                if (input == string.Empty)
+                {
+                    DisplayAccountsForWithdrawal();
+                }
 
                 if (!ValidateMoneyInput(input))
                 {
@@ -482,6 +562,7 @@ Enter the amount you would like to deposit, or press enter to return : $");
                 {
                     // Update DB
                     _accountService.AddBalanceAsync(account, balance: decimal.Parse(input)).Wait();
+                    _transactionService.AddTransactionAsync("D", account.AccountNumber, decimal.Parse(input), DateTime.UtcNow).Wait();
 
                     Console.WriteLine($"Deposit of ${input} was succesful");
                     Console.WriteLine($"Your balance is now {account.Balance}");
