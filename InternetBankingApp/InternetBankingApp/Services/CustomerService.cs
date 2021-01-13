@@ -45,10 +45,10 @@ namespace InternetBankingApp.Services
 
         public async Task InsertCustomerDataAsync()
         {
-            //if (_customerManager.GetAllCustomers().Any())
-            //{
-            //    return;
-            //}
+            if (_customerManager.GetAllCustomers().Any())
+            {
+                return;
+            }
             var customers = await GetCustomersAsync();
             foreach (var customer in customers)
             {

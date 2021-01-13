@@ -23,6 +23,11 @@ namespace InternetBankingApp.Services
             return customer.Accounts.First(x => x.AccountType == accountType);
         }
 
+        public Account GetAccountByNumber(int accountNumber)
+        {
+            return _accountManager.GetAccountByNumber(accountNumber);
+        }
+
         public async Task AddBalanceAsync(Account account, decimal balance)
         {
             if (account is null)
@@ -54,7 +59,7 @@ namespace InternetBankingApp.Services
 
         public async Task InsertAccountsAsync(List<Account> accounts)
         {
-            foreach(var account in accounts)
+            foreach (var account in accounts)
             {
                 await _accountManager.InsertAccountAsync(account);
             }

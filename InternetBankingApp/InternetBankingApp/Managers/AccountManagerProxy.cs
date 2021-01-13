@@ -28,7 +28,7 @@ namespace InternetBankingApp.Managers
             Accounts = command.GetDataTable().Select().Select(x => new Account
             {
                 AccountNumber = (int)x["AccountNumber"],
-                AccountType = (string)x["AccountType"], //TODO make enum?
+                AccountType = (string)x["AccountType"],
                 CustomerID = (int)x["CustomerID"],
                 Balance = (decimal)x["Balance"],
                 Transactions = transactionManager.GetTransactions((int)x["CustomerID"])
@@ -39,6 +39,11 @@ namespace InternetBankingApp.Managers
         public List<Account> GetAccounts(int customerID)
         {
             return Accounts.Where(x => x.CustomerID == customerID).ToList();
+        }
+
+        public Account GetAccountByNumber(int accountNumber)
+        {
+            return Accounts.FirstOrDefault(x => x.AccountNumber == accountNumber);
         }
 
         public async Task InsertAccountAsync(Account account)

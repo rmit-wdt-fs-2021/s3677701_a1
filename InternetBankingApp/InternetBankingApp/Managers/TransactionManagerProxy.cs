@@ -42,10 +42,6 @@ namespace InternetBankingApp.Managers
 
         public async Task InsertTransactionAsync(Transaction transaction)
         {
-            if (Transactions.Any())
-            {
-                return;
-            }
 
             using var connection = _connectionString.CreateConnection();
             connection.Open();
@@ -54,7 +50,6 @@ namespace InternetBankingApp.Managers
             command.CommandText =
                 "insert into [Transaction] (TransactionType, AccountNumber, DestinationAccountNumber, Amount, Comment, TransactionTimeUtc)" +
                 "values (@transactionType, @accountNumber, @destinationAccountNumber, @amount, @comment, @transactionTimeUtc)";
-            //command.Parameters.AddWithValue("transactionID", transaction.TransactionID);
             command.Parameters.AddWithValue("transactionType", transaction.TransactionType);
             command.Parameters.AddWithValue("AccountNumber", transaction.AccountNumber);
             command.Parameters.AddWithValue("DestinationAccountNumber", transaction.DestinationAccountNumber is null ? DBNull.Value : transaction.DestinationAccountNumber);

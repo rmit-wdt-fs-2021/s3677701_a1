@@ -16,6 +16,11 @@ namespace InternetBankingApp.Managers
             _connectionString = connectionString;
         }
 
+        public Account GetAccountByNumber(int accountNumber)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public List<Account> GetAccounts(int customerID)
         {
             using var connection = _connectionString.CreateConnection();

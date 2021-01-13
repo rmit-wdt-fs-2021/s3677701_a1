@@ -18,7 +18,8 @@ namespace InternetBankingApp
             loginService.InsertLoginsAsync().Wait();
 
             var accountService = new AccountService(connectionString);
-            //var menu = new Menu(loginService, customerService, accountService);
+            var transactionService = new TransactionService(connectionString);
+            var menu = new Menu(loginService, customerService, accountService, transactionService);
         }
     }
 }

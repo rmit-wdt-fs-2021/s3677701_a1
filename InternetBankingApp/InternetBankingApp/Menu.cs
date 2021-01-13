@@ -25,12 +25,16 @@ namespace InternetBankingApp
         private readonly ILoginService _loginService;
         private readonly ICustomerService _customerService;
         private readonly IAccountService _accountService;
+        private readonly ITransactionService _transactionService;
+
         private Customer _loggedInCustomer;
-        public Menu(LoginService loginService, CustomerService customerService, AccountService accountService)
+
+        public Menu(LoginService loginService, CustomerService customerService, AccountService accountService, TransactionService transactionService)
         {
             _loginService = loginService;
             _customerService = customerService;
             _accountService = accountService;
+            _transactionService = transactionService;
             DisplayLogin();
         }
 
@@ -38,7 +42,6 @@ namespace InternetBankingApp
         {
             while (true)
             {
-                // TODO replace dude with name
                 Console.Write(
  @$"----- Main Menu ----
 Welcome {_loggedInCustomer.Name}
@@ -126,6 +129,17 @@ Enter an option: ");
 
         private void Transfer(Account srcAccount)
         {
+            //TODO this reeallly needs to be refactored!
+            Account savingsAcc = null;
+            Account checkingAcc = null;
+            if (_loggedInCustomer.HasSavingsAccount())
+            {
+                savingsAcc = _accountService.GetAccount("S", _loggedInCustomer);
+            }
+            if (_loggedInCustomer.HasCheckingAccount())
+            {
+                checkingAcc = _accountService.GetAccount("C", _loggedInCustomer);
+            }
 
             while (true) {
                 Console.Write("Enter the account number you wish to transfer to, or press enter to return to the account selection menu : ");
@@ -145,6 +159,12 @@ Enter an option: ");
                     continue;
                 }
 
+                if(accountNumber == srcAccount.AccountNumber)
+                {
+                    Console.WriteLine("Source and destination account number cannot be the same.");
+                    continue;
+                }
+
                 Console.Write(
 @$"--- Transfer Amount ---
 
@@ -160,10 +180,22 @@ Enter the amount you would like to transfer to account {accountNumber}, or press
                     break;
                 }
 
+                if (!ValidateMoneyInput(transferInput))
+                {
+                    continue;
+                }
+
                 Console.Write("Please add a description (optional): ");
                 var desc = Console.ReadLine();
+                Console.WriteLine();
+                // Update DB
+                _transactionService.AddTransactionAsync("T", srcAccount.AccountNumber, decimal.Parse(transferInput), DateTime.UtcNow, accountNumber, comment: desc).Wait();
 
-
+                Console.WriteLine($"Your balance is now {srcAccount.Balance}");
+                Console.WriteLine("Press any key to return to the account selection menu.");
+                Console.ReadKey();
+                AccountSelectionMenu("Select an account to transfer money from", savingsAcc, checkingAcc);
+                break;
             }
         }
 
@@ -521,7 +553,7 @@ Enter the amount you would like to deposit, or press enter to return : $");
                 }
                 else
                 {
-                    Console.WriteLine("Cannot deposit 0 or negative number");
+                    Console.WriteLine("Money cannot be 0 or negative number");
                     retVal = false;
                 }
             }
