@@ -21,8 +21,8 @@ namespace InternetBankingApp.Models
 
         private const int FreeTransactions = 4;
 
-        public int AccountTransactions { get; set; } = 0;
+        public int ChargeableTransactions { get; set; } = 0;
 
-        public bool HasFreeTransaction => AccountTransactions <= FreeTransactions;
+        public bool HasFreeTransaction => ChargeableTransactions <= FreeTransactions;
     }
 }

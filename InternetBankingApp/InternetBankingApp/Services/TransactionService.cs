@@ -56,7 +56,13 @@ namespace InternetBankingApp.Services
                     await UpdateWithdrawnAccountBalance(accountNumber, amount);
                     break;
                 case "S":
-                    await ApplyServiceCharge(transactionType, accountNumber);
+                    var account = _accountService.GetAccountByNumber(accountNumber);
+                    if (account.HasFreeTransaction)
+                    {
+                        return;
+                    }
+
+                    await ApplyServiceCharge(account, amount);
                     break;
                 default:
                     throw new ArgumentException($"Unknown transaction type : {transactionType}");
@@ -66,34 +72,16 @@ namespace InternetBankingApp.Services
             await _transactionManager.InsertTransactionAsync(transaction);
         }
 
-        private async Task ApplyServiceCharge(string transactionType, int accountNumber)
+        private async Task ApplyServiceCharge(Account accountToCharge, decimal serviceCharge)
         {
-            var account = _accountService.GetAccountByNumber(accountNumber);
-
-            if (account.HasFreeTransaction)
-            {
-                return;
-            }
-
-            decimal serviceCharge;
-            if (transactionType == "W")
-            {
-                serviceCharge = 0.10M;
-            }
-            else if (transactionType == "T")
-            {
-                serviceCharge = 0.20M;
-            }
-            else
-            {
-                throw new ArgumentException($"Unable to apply service charge to transaction : {transactionType}");
-            }
-            await _accountService.DeductBalanceAsync(account, serviceCharge);
+            await _accountService.DeductBalanceAsync(accountToCharge, serviceCharge);
         }
 
         private async Task UpdateWithdrawnAccountBalance(int accountNumber, decimal amount)
         {
-            await _accountService.DeductBalanceAsync(_accountService.GetAccountByNumber(accountNumber), amount);
+            var account = _accountService.GetAccountByNumber(accountNumber);
+            await _accountService.DeductBalanceAsync(account, amount);
+            account.ChargeableTransactions++;
         }
 
         private async Task UpdateDepositAccountBalance(int accountNumber, decimal amount)
@@ -106,7 +94,13 @@ namespace InternetBankingApp.Services
             var srcAccount = _accountService.GetAccountByNumber(accountNumber);
             var destAccount = _accountService.GetAccountByNumber(destinationAccountNumber);
             await _accountService.DeductBalanceAsync(srcAccount, amount);
+            srcAccount.ChargeableTransactions++;
             await _accountService.AddBalanceAsync(destAccount, amount);
+        }
+
+        public List<Transaction> GetPagedTransactions(Account account, int? top = null)
+        {
+            return _transactionManager.GetTransactions(account.AccountNumber);
         }
 
         private static Transaction CreateTransaction(string transactionType, int accountNumber, decimal amount,

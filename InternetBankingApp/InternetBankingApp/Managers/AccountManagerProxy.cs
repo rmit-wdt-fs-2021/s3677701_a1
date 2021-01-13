@@ -14,18 +14,22 @@ namespace InternetBankingApp.Managers
     {
         private readonly string _connectionString;
         
-        public List<Account> Accounts { get; }
+        public List<Account> Accounts { get; set; }
 
         public AccountManagerProxy(string connectionString)
         {
             _connectionString = connectionString;
+            Accounts = GetAllAccouts();
+        }
 
+        private List<Account> GetAllAccouts()
+        {
             using var connection = _connectionString.CreateConnection();
             SqlCommand command = connection.CreateCommand();
             command.CommandText = "select * from Account";
 
             var transactionManager = new TransactionManagerProxy(_connectionString);
-            Accounts = command.GetDataTable().Select().Select(x => new Account
+            return command.GetDataTable().Select().Select(x => new Account
             {
                 AccountNumber = (int)x["AccountNumber"],
                 AccountType = (string)x["AccountType"],
@@ -33,7 +37,6 @@ namespace InternetBankingApp.Managers
                 Balance = (decimal)x["Balance"],
                 Transactions = transactionManager.GetTransactions((int)x["CustomerID"])
             }).ToList();
-
         }
 
         public List<Account> GetAccounts(int customerID)
@@ -71,7 +74,7 @@ namespace InternetBankingApp.Managers
         {
             if (account is null)
             {
-                throw new ArgumentNullException(nameof(account));
+                throw new ArgumentNullException($"{nameof(account)} cannot be null");
             }
 
             using var connection = _connectionString.CreateConnection();
@@ -83,6 +86,7 @@ namespace InternetBankingApp.Managers
             command.Parameters.AddWithValue("accountNumber", account.AccountNumber);
 
             await command.ExecuteNonQueryAsync();
+            Accounts = GetAllAccouts();
             // TODO : err handle if update not successful
         }
     }

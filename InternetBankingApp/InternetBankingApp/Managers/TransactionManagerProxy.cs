@@ -13,7 +13,7 @@ namespace InternetBankingApp.Managers
     {
         private readonly string _connectionString;
 
-        public List<Transaction> Transactions;
+        public List<Transaction> Transactions { get; }
 
         public TransactionManagerProxy(string connectionString)
         {

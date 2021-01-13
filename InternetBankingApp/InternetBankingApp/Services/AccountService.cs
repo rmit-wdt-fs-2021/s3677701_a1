@@ -32,7 +32,7 @@ namespace InternetBankingApp.Services
         {
             if (account is null)
             {
-                throw new ArgumentNullException(nameof(account));
+                throw new ArgumentNullException($"{nameof(account)} cannot be null.");
             }
             account.Balance += balance;
             await _accountManager.UpdateAccountBalanceAsync(account);
