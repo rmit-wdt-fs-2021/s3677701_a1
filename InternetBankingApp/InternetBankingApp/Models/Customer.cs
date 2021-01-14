@@ -13,11 +13,11 @@ namespace InternetBankingApp.Models
         public string Name { get; set; }
 
         // TODO : Property type is object as to cater for DBNull value.
-        public object Address { get; set; }
+        public string Address { get; set; }
 
-        public object City { get; set; }
+        public string City { get; set; }
 
-        public object PostCode { get; set; }
+        public string PostCode { get; set; }
 
         public IList<Account> Accounts { get; set; }
 

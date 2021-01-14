@@ -114,7 +114,6 @@ Enter an option: ");
                     case 1:
                         if (_loggedInCustomer.HasSavingsAccount())
                         {
-                            // DisplayStatement
                             DisplayStatement(_loggedInCustomer.SavingsAccount);
                         }
                         else
@@ -644,7 +643,7 @@ Enter the amount you would like to deposit, or press enter to return : $");
             }
         }
 
-        private bool ValidateMoneyInput(string input)
+        private static bool ValidateMoneyInput(string input)
         {
             bool retVal;
             if (!decimal.TryParse(input, out decimal option))

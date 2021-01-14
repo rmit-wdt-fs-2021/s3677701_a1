@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InternetBankingApp.Models
 {
@@ -12,7 +9,7 @@ namespace InternetBankingApp.Models
         public int AccountNumber { get; set; }
 
         public string AccountType { get; set; }
-        
+
         public int CustomerID { get; set; }
 
         public decimal Balance { get; set; }
@@ -23,6 +20,8 @@ namespace InternetBankingApp.Models
 
         public int ChargeableTransactions { get; set; } = 0;
 
-        public bool HasFreeTransaction => ChargeableTransactions <= FreeTransactions;
+        public bool HasFreeTransaction => Transactions.Where(x => x.TransactionType == "W")
+                                                      .Where(x => x.TransactionType == "T")
+                                                      .Count() <= FreeTransactions;
     }
 }

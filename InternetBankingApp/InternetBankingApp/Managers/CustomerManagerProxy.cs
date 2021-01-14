@@ -30,9 +30,9 @@ namespace InternetBankingApp.Managers
             {
                 CustomerID = (int)x["CustomerID"],
                 Name = (string)x["Name"],
-                Address = x["Address"],
-                City = x["City"],
-                PostCode = x["PostCode"],
+                Address = Convert.IsDBNull(x["Address"]) ? null : (string)x["Address"],
+                City = Convert.IsDBNull(x["City"]) ? null : (string)x["City"],
+                PostCode = Convert.IsDBNull(x["PostCode"]) ? null : (string)x["PostCode"],
                 Accounts = accountManager.GetAccounts((int)x["CustomerID"])
             }).ToList();
         }
