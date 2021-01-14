@@ -3,8 +3,6 @@ using InternetBankingApp.Models;
 using InternetBankingApp.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace InternetBankingApp.Managers
@@ -23,7 +21,7 @@ namespace InternetBankingApp.Managers
             throw new NotImplementedException();
         }
 
-        public List<Transaction> GetTransactions(int accountNumber)
+        public IList<Transaction> GetTransactions(int accountNumber)
         {
             throw new NotImplementedException();
         }

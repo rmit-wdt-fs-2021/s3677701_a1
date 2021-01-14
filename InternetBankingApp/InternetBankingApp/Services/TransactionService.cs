@@ -96,9 +96,10 @@ namespace InternetBankingApp.Services
             await _accountService.AddBalanceAsync(destAccount, amount);
         }
 
-        public List<Transaction> GetPagedTransactions(Account account, int? top = null, int? skip = 0)
+        public List<Transaction> GetPagedTransactions(Account account, int top = 4, int skip = 0)
         {
-            return _transactionManager.GetPagedTransactions(account.AccountNumber, 4, skip);
+            ITransactionTarget transactionAdapter = new TransactionManagerAdapter(_connectionString);
+            return transactionAdapter.GetPagedTransactions(account.AccountNumber, top, skip);
         }
 
         private static Transaction CreateTransaction(string transactionType, int accountNumber, decimal amount,

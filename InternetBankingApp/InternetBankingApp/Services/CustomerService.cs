@@ -2,6 +2,7 @@
 using InternetBankingApp.Managers;
 using InternetBankingApp.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,13 +34,23 @@ namespace InternetBankingApp.Services
 
         private async Task<List<Customer>> GetCustomersAsync()
         {
+            List<Customer> customers;
             using var client = new HttpClient();
-            var customerResponse = await client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/customers/");
-
-            var customers = JsonConvert.DeserializeObject<List<Customer>>(customerResponse, new JsonSerializerSettings
+            try
             {
-                DateFormatString = "dd/MM/yyyy hh:mm:ss tt"
-            });
+                var customerResponse = await client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/customers/");
+                customers = JsonConvert.DeserializeObject<List<Customer>>(customerResponse, new JsonSerializerSettings
+                {
+                    DateFormatString = "dd/MM/yyyy hh:mm:ss tt"
+                });
+            }
+            catch(AggregateException e)
+            {
+                Console.WriteLine("Unable to contact web service. Please try again later.");
+                Console.WriteLine(e.Message);
+                throw;
+            }
+          
             return customers;
         }
 
@@ -68,6 +79,13 @@ namespace InternetBankingApp.Services
                     }
                 }
             }
+        }
+
+
+        //TODO
+        private bool IsValidJson(string json)
+        {
+            return true;
         }
     }
 }

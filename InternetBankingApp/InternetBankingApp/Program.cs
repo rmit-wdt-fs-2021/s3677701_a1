@@ -1,9 +1,6 @@
 ﻿using Authentication;
-using InternetBankingApp.Interfaces;
-using InternetBankingApp.Managers;
 using InternetBankingApp.Services;
 using Microsoft.Extensions.Configuration;
-using System;
 
 namespace InternetBankingApp
 {
