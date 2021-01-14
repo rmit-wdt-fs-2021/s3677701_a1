@@ -17,6 +17,7 @@ namespace InternetBankingApp.Services
 
         public TransactionService(string connectionString)
         {
+            _connectionString = connectionString;
             _transactionManager = new TransactionManagerProxy(connectionString);
             _accountService = new AccountService(connectionString);
         }

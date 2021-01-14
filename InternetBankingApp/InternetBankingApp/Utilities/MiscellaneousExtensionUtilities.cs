@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using Microsoft.Data.SqlClient;
 
 namespace InternetBankingApp.Utilities
@@ -20,5 +21,7 @@ namespace InternetBankingApp.Utilities
 
             return table;
         }
+
+        public static decimal RoundUp(this decimal number, int places = 2) => Math.Round(number, places);
     }
 }

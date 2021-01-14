@@ -180,14 +180,13 @@ Enter an option: ");
 
         private void DisplayPagedStatementTable(Account account, int skip)
         {
-            const int top = 4;
             const string format = "{0,-20} | {1,-5} | {2,-15} | {3,-15} | {4,-15} | {5,-20} | {6}";
             Console.WriteLine(format, "Transaction Id", "Type", "From Account", "To Account", "Amount", "Comment", "Date");
             Console.WriteLine(new string('-', 135));
-            foreach (var trans in _transactionService.GetPagedTransactions(account, top, skip))
+            foreach (var trans in _transactionService.GetPagedTransactions(account, 4, skip: skip))
             {
                 Console.WriteLine(format, trans.TransactionID, trans.TransactionType, trans.AccountNumber, trans.DestinationAccountNumber,
-                    trans.Amount, trans.Comment, trans.TransactionTimeUtc.ToLocalTime());
+                    trans.Amount.RoundUp(), trans.Comment, trans.TransactionTimeUtc.ToLocalTime());
             }
 
         }

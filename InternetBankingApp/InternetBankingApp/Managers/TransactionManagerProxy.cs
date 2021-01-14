@@ -65,28 +65,6 @@ namespace InternetBankingApp.Managers
             }).ToList();
         }
 
-        public List<Transaction> GetPagedTransactions(int accountNumber, int top, int? skip = 0)
-        {
-            using var connection = _connectionString.CreateConnection();
-            var command = connection.CreateCommand();
-            command.CommandText = "select * from [Transaction]";
-
-            return command.GetDataTable().Select().Select(x => new Transaction
-            {
-                TransactionID = (int)x["TransactionID"],
-                TransactionType = (string)x["TransactionType"],
-                AccountNumber = (int)x["AccountNumber"],
-                DestinationAccountNumber = Convert.IsDBNull(x["DestinationAccountNumber"]) ? null : (int?)x["DestinationAccountNumber"],
-                Amount = (decimal)x["Amount"],
-                Comment = Convert.IsDBNull(x["Comment"]) ? null : (string)x["Comment"],
-                TransactionTimeUtc = (DateTime)x["TransactionTimeUtc"]
-            }).Where(x => x.AccountNumber == accountNumber)
-            .AsEnumerable()
-            .Skip(skip.Value)
-            .Take(top)
-            .ToList();
-        }
-
         public async Task InsertTransactionAsync(Transaction transaction)
         {
             using var connection = _connectionString.CreateConnection();
