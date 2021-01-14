@@ -9,6 +9,7 @@ namespace InternetBankingApp.Interfaces
 {
     public interface ITransactionManager
     {
+        List<Transaction> GetPagedTransactions(int accountNumber, int top);
         public List<Transaction> GetTransactions(int accountNumber);
         public Task InsertTransactionAsync(Transaction transaction);
     }

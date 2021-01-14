@@ -30,7 +30,7 @@ namespace InternetBankingApp.Managers
                 AccountNumber = (int)x["AccountNumber"],
                 DestinationAccountNumber = Convert.IsDBNull(x["DestinationAccountNumber"]) ? null : (int?)x["DestinationAccountNumber"],
                 Amount = (decimal)x["Amount"],
-                Comment = (object)x["Comment"],
+                Comment = Convert.IsDBNull(x["Comment"]) ? null : (string)x["Comment"],
                 TransactionTimeUtc = (DateTime)x["TransactionTimeUtc"]
             }).ToList();
         }
@@ -40,9 +40,27 @@ namespace InternetBankingApp.Managers
             return Transactions.Where(x => x.AccountNumber == accountNumber).ToList();
         }
 
+        public List<Transaction> GetPagedTransactions(int accountNumber, int top)
+        {
+            using var connection = _connectionString.CreateConnection();
+            var command = connection.CreateCommand();
+            command.CommandText = "select * from [Transaction]";
+
+            return command.GetDataTable().Select().Select(x => new Transaction
+            {
+                TransactionID = (int)x["TransactionID"],
+                TransactionType = (string)x["TransactionType"],
+                AccountNumber = (int)x["AccountNumber"],
+                DestinationAccountNumber = Convert.IsDBNull(x["DestinationAccountNumber"]) ? null : (int?)x["DestinationAccountNumber"],
+                Amount = (decimal)x["Amount"],
+                Comment = Convert.IsDBNull(x["Comment"]) ? null : (string)x["Comment"],
+                TransactionTimeUtc = (DateTime)x["TransactionTimeUtc"]
+            }).Where(x => x.AccountNumber == accountNumber)
+            .AsEnumerable().Take(top).ToList();
+        }
+
         public async Task InsertTransactionAsync(Transaction transaction)
         {
-
             using var connection = _connectionString.CreateConnection();
             connection.Open();
 
@@ -54,7 +72,7 @@ namespace InternetBankingApp.Managers
             command.Parameters.AddWithValue("AccountNumber", transaction.AccountNumber);
             command.Parameters.AddWithValue("DestinationAccountNumber", transaction.DestinationAccountNumber is null ? DBNull.Value : transaction.DestinationAccountNumber);
             command.Parameters.AddWithValue("Amount", transaction.Amount);
-            command.Parameters.AddWithValue("Comment", transaction.Comment ?? DBNull.Value);
+            command.Parameters.AddWithValue("Comment", transaction.Comment is null ? DBNull.Value : transaction.Comment);
             command.Parameters.AddWithValue("TransactionTimeUtc", transaction.TransactionTimeUtc);
 
             await command.ExecuteNonQueryAsync();

@@ -147,7 +147,7 @@ Enter an option: ");
             const string format = "{0,-5} | {1,-20} | {2,-20} | {3}";
             Console.WriteLine(format, "Transaction Id", "Type", "From Account", "To Account", "Amount", "Comment", "Date");
             Console.WriteLine(new string('-', 70));
-            foreach(var x in _transactionService.GetPagedTransactions(account))
+            foreach(var x in _transactionService.GetPagedTransactions(account, 4))
             {
                 Console.WriteLine(format, x.TransactionID, x.TransactionType, x.AccountNumber, x.DestinationAccountNumber, x.Amount, x.Comment, x.TransactionTimeUtc);
             }

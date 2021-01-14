@@ -100,7 +100,7 @@ namespace InternetBankingApp.Services
 
         public List<Transaction> GetPagedTransactions(Account account, int? top = null)
         {
-            return _transactionManager.GetTransactions(account.AccountNumber);
+            return _transactionManager.GetPagedTransactions(account.AccountNumber, 4);
         }
 
         private static Transaction CreateTransaction(string transactionType, int accountNumber, decimal amount,
