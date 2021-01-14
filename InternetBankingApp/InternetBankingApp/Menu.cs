@@ -637,20 +637,6 @@ Enter the amount you would like to deposit, or press enter to return : $");
             return passwordBuilder.ToString();
         }
 
-        private bool ValidateMenuInput(string input, int maxRange)
-        {
-            if (!int.TryParse(input, out int option) || !option.IsInRange(1, maxRange))
-            {
-                Console.WriteLine("Invalid input.");
-                Console.WriteLine();
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
         private static bool ValidateMoneyInput(string input)
         {
             bool retVal;
