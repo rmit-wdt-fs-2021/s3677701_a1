@@ -35,7 +35,7 @@ namespace InternetBankingApp.Managers
                 AccountType = (string)x["AccountType"],
                 CustomerID = (int)x["CustomerID"],
                 Balance = (decimal)x["Balance"],
-                Transactions = transactionManager.GetTransactions((int)x["CustomerID"])
+                Transactions = transactionManager.GetTransactions((int)x["AccountNumber"])
             }).ToList();
         }
 

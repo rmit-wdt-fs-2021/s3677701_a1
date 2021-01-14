@@ -57,7 +57,7 @@ namespace InternetBankingApp.Services
                     break;
                 case "S":
                     var account = _accountService.GetAccountByNumber(accountNumber);
-                    if (account.HasFreeTransaction)
+                    if (account.HasFreeTransaction())
                     {
                         return;
                     }

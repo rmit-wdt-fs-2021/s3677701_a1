@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace InternetBankingApp.Models
 {
@@ -20,8 +21,6 @@ namespace InternetBankingApp.Models
 
         public int ChargeableTransactions { get; set; } = 0;
 
-        public bool HasFreeTransaction => Transactions.Where(x => x.TransactionType == "W")
-                                                      .Where(x => x.TransactionType == "T")
-                                                      .Count() <= FreeTransactions;
+        public bool HasFreeTransaction() => Transactions.Count(x => x.TransactionType == "T" || x.TransactionType == "W") <= FreeTransactions;
     }
 }

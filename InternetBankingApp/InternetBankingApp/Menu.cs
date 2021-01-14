@@ -124,7 +124,7 @@ Enter an option: ");
                     case 2:
                         if (_loggedInCustomer.HasCheckingAccount())
                         {
-                            
+                            DisplayStatement(_loggedInCustomer.CheckingAccount);
                         }
                         else
                         {
