@@ -82,7 +82,7 @@ Enter an option: ");
                         DisplayStatementsMenu();
                         break;
                     case MenuChoice.Logout:
-                        Console.WriteLine("Logging out..");
+                        LogoutUser();
                         break;
                     case MenuChoice.Exit:
                         Console.WriteLine("Closing app..");
@@ -92,6 +92,14 @@ Enter an option: ");
                         throw new InvalidOperationException();
                 }
             }
+        }
+
+        private void LogoutUser()
+        {
+            Console.WriteLine($"Logging out {_loggedInCustomer.Name}");
+            _loggedInCustomer = null;
+            Console.Clear();
+            DisplayLogin();
         }
 
         private void DisplayStatementsMenu()

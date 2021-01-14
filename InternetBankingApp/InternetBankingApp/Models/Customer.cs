@@ -12,7 +12,6 @@ namespace InternetBankingApp.Models
   
         public string Name { get; set; }
 
-        // TODO : Property type is object as to cater for DBNull value.
         public string Address { get; set; }
 
         public string City { get; set; }
@@ -21,9 +20,9 @@ namespace InternetBankingApp.Models
 
         public IList<Account> Accounts { get; set; }
 
-        public Account SavingsAccount => Accounts.First(x => x.AccountType == "S");
+        public Account SavingsAccount => Accounts.FirstOrDefault(x => x.AccountType == "S");
 
-        public Account CheckingAccount => Accounts.First(x => x.AccountType == "C");
+        public Account CheckingAccount => Accounts.FirstOrDefault(x => x.AccountType == "C");
 
         public bool HasSavingsAccount() => Accounts.Any(x => x.AccountType == "S");
 

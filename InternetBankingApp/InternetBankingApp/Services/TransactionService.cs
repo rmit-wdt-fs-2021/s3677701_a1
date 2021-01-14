@@ -81,7 +81,6 @@ namespace InternetBankingApp.Services
         {
             var account = _accountService.GetAccountByNumber(accountNumber);
             await _accountService.DeductBalanceAsync(account, amount);
-            account.ChargeableTransactions++;
         }
 
         private async Task UpdateDepositAccountBalance(int accountNumber, decimal amount)
@@ -94,7 +93,6 @@ namespace InternetBankingApp.Services
             var srcAccount = _accountService.GetAccountByNumber(accountNumber);
             var destAccount = _accountService.GetAccountByNumber(destinationAccountNumber);
             await _accountService.DeductBalanceAsync(srcAccount, amount);
-            srcAccount.ChargeableTransactions++;
             await _accountService.AddBalanceAsync(destAccount, amount);
         }
 
