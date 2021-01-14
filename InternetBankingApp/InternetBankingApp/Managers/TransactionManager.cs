@@ -18,7 +18,7 @@ namespace InternetBankingApp.Managers
             _connectionString = connectionString;
         }
 
-        public List<Transaction> GetPagedTransactions(int accountNumber, int top)
+        public List<Transaction> GetPagedTransactions(int accountNumber, int top, int? skip = 0)
         {
             throw new NotImplementedException();
         }

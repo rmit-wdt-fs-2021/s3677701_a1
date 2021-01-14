@@ -10,6 +10,6 @@ namespace InternetBankingApp.Interfaces
     public interface ITransactionService
     {
         Task AddTransactionAsync(string transactionType, int accountNumber, decimal amount, DateTime transactionTime, int? destinationAccountNumber = null, string comment = null);
-        List<Transaction> GetPagedTransactions(Account account, int? top = null);
+        List<Transaction> GetPagedTransactions(Account account, int? top = null, int? skip = 0);
     }
 }

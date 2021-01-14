@@ -40,7 +40,7 @@ namespace InternetBankingApp.Managers
             return Transactions.Where(x => x.AccountNumber == accountNumber).ToList();
         }
 
-        public List<Transaction> GetPagedTransactions(int accountNumber, int top)
+        public List<Transaction> GetPagedTransactions(int accountNumber, int top, int? skip = 0)
         {
             using var connection = _connectionString.CreateConnection();
             var command = connection.CreateCommand();
@@ -56,7 +56,10 @@ namespace InternetBankingApp.Managers
                 Comment = Convert.IsDBNull(x["Comment"]) ? null : (string)x["Comment"],
                 TransactionTimeUtc = (DateTime)x["TransactionTimeUtc"]
             }).Where(x => x.AccountNumber == accountNumber)
-            .AsEnumerable().Take(top).ToList();
+            .AsEnumerable()
+            .Skip(skip.Value)
+            .Take(top)
+            .ToList();
         }
 
         public async Task InsertTransactionAsync(Transaction transaction)

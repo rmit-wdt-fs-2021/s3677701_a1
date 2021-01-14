@@ -143,15 +143,44 @@ Enter an option: ");
 
         private void DisplayStatement(Account account)
         {
-            Console.WriteLine($"Account {account.AccountNumber} - Current balance: {account.Balance}");
-            const string format = "{0,-5} | {1,-20} | {2,-20} | {3}";
-            Console.WriteLine(format, "Transaction Id", "Type", "From Account", "To Account", "Amount", "Comment", "Date");
-            Console.WriteLine(new string('-', 70));
-            foreach(var x in _transactionService.GetPagedTransactions(account, 4))
+            int skip = 0;
+            while (true)
             {
-                Console.WriteLine(format, x.TransactionID, x.TransactionType, x.AccountNumber, x.DestinationAccountNumber, x.Amount, x.Comment, x.TransactionTimeUtc);
+                Console.WriteLine($"Account {account.AccountNumber} - Current balance: {account.Balance}\n");
+
+                DisplayPagedStatementTable(account, skip);
+                Console.WriteLine();
+                Console.WriteLine("Press the right arrow => to view the next page of transactions.");
+                Console.WriteLine("Press enter to return to the account selection.");
+                Console.WriteLine();
+                ConsoleKeyInfo key = Console.ReadKey();
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    AccountSelectionMenu("Select an account to display the statement for", _loggedInCustomer.SavingsAccount,
+                        _loggedInCustomer.CheckingAccount);
+                    break;
+
+                }
+                else if (key.Key == ConsoleKey.RightArrow)
+                {
+                    skip += 4;
+                    continue;
+                }
             }
-            //GetPagedTransactions()
+        }
+
+        private void DisplayPagedStatementTable(Account account, int skip)
+        {
+            const int top = 4;
+            const string format = "{0,-20} | {1,-5} | {2,-15} | {3,-15} | {4,-15} | {5,-20} | {6}";
+            Console.WriteLine(format, "Transaction Id", "Type", "From Account", "To Account", "Amount", "Comment", "Date");
+            Console.WriteLine(new string('-', 135));
+            foreach (var trans in _transactionService.GetPagedTransactions(account, top, skip))
+            {
+                Console.WriteLine(format, trans.TransactionID, trans.TransactionType, trans.AccountNumber, trans.DestinationAccountNumber,
+                    trans.Amount, trans.Comment, trans.TransactionTimeUtc.ToLocalTime());
+            }
+
         }
 
         private void DisplayTransferMenu()
