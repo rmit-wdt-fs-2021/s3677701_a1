@@ -1,4 +1,5 @@
-﻿using InternetBankingApp.Interfaces;
+﻿using Authentication;
+using InternetBankingApp.Interfaces;
 using InternetBankingApp.Managers;
 using InternetBankingApp.Services;
 using Microsoft.Extensions.Configuration;

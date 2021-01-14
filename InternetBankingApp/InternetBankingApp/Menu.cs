@@ -1,4 +1,6 @@
-﻿using InternetBankingApp.Exceptions;
+﻿using Authentication;
+using Authentication.Interfaces;
+using InternetBankingApp.Exceptions;
 using InternetBankingApp.Interfaces;
 using InternetBankingApp.Models;
 using InternetBankingApp.Services;
