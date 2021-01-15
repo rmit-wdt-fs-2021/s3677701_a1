@@ -1,15 +1,11 @@
 ﻿using Authentication;
 using Authentication.Interfaces;
-using InternetBankingApp.Exceptions;
 using InternetBankingApp.Interfaces;
 using InternetBankingApp.Models;
 using InternetBankingApp.Services;
 using InternetBankingApp.Utilities;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace InternetBankingApp
 {
@@ -155,7 +151,7 @@ Enter an option: ");
             int skip = 0;
             while (true)
             {
-                Console.WriteLine($"Account {account.AccountNumber} - Current balance: {account.Balance}\n");
+                Console.WriteLine($"Account {account.AccountNumber} - Current balance: {account.Balance.RoundUp()}\n");
 
                 DisplayPagedStatementTable(account, skip);
                 Console.WriteLine();
@@ -183,10 +179,18 @@ Enter an option: ");
             const string format = "{0,-20} | {1,-5} | {2,-15} | {3,-15} | {4,-15} | {5,-20} | {6}";
             Console.WriteLine(format, "Transaction Id", "Type", "From Account", "To Account", "Amount", "Comment", "Date");
             Console.WriteLine(new string('-', 135));
-            foreach (var trans in _transactionService.GetPagedTransactions(account, 4, skip: skip))
+            var pagedTransactions = _transactionService.GetPagedTransactions(account, 4, skip: skip);
+            if (pagedTransactions.Count == 0)
             {
-                Console.WriteLine(format, trans.TransactionID, trans.TransactionType, trans.AccountNumber, trans.DestinationAccountNumber,
-                    trans.Amount.RoundUp(), trans.Comment, trans.TransactionTimeUtc.ToLocalTime());
+                Console.WriteLine("You have reached the end.");
+            }
+            else
+            {
+                foreach (var trans in pagedTransactions)
+                {
+                    Console.WriteLine(format, trans.TransactionID, trans.TransactionType, trans.AccountNumber, trans.DestinationAccountNumber,
+                        trans.Amount.RoundUp(), trans.Comment, trans.TransactionTimeUtc.ToLocalTime());
+                }
             }
 
         }
