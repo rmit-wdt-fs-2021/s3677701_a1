@@ -44,7 +44,7 @@ namespace InternetBankingApp.Services
                 });
                 if (IsValidData(customers))
                 {
-                    throw new JsonException("Error reading data.");
+                    throw new JsonException("Error reading customer data.");
                 }
             }
             catch (AggregateException e)

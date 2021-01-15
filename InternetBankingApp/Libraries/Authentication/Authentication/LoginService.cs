@@ -54,8 +54,29 @@ namespace Authentication
             var logins = await GetLoginsAsync();
             foreach (var login in logins)
             {
-                await _loginManager.InsertLoginAsync(login);
+                if (IsValidData(login))
+                {
+                    await _loginManager.InsertLoginAsync(login);
+                }
+                else
+                {
+                    throw new Exception("Unable to fetch login details.");
+                }
             }
+        }
+
+        private static bool IsValidData(Login login)
+        {
+            bool retVal = true;
+
+            if (login.LoginID.Length != 8
+                && login.CustomerID.ToString().Length != 4
+                && string.IsNullOrEmpty(login.PasswordHash))
+            {
+                retVal = false;
+            }
+
+            return retVal;
         }
     }
 }
