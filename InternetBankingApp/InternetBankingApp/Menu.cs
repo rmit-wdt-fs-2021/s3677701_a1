@@ -545,7 +545,7 @@ Enter the amount you would like to withdraw, or press enter to return : $");
                         Console.WriteLine(e.Message);
                     }
 
-                    Console.WriteLine($"Your balance is now {account.Balance}");
+                    DisplayBalance(account);
                     Console.WriteLine("Press any key to return to account selection menu.\n");
                     Console.ReadKey();
                     DisplayAccountsForWithdrawal();
@@ -587,7 +587,7 @@ Enter the amount you would like to deposit, or press enter to return : $");
                     _transactionService.AddTransactionAsync("D", account, decimal.Parse(input), DateTime.UtcNow).Wait();
 
                     Console.WriteLine($"Deposit of ${input} was succesful");
-                    Console.WriteLine($"Your balance is now {account.Balance}");
+                    DisplayBalance(account);
                     Console.WriteLine("Press any key to return to account selection menu.\n");
                     Console.ReadKey();
                     DisplayAccountsForDeposit();
