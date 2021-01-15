@@ -10,11 +10,13 @@ namespace Authentication.Manager
     public class LoginManagerProxy : ILoginManager
     {
         private readonly string _connectionString;
+        private readonly LoginManager _loginManager;
         public List<Login> Logins { get; }
 
         public LoginManagerProxy(string connectionString)
         {
             _connectionString = connectionString;
+            _loginManager = new LoginManager(connectionString);
 
             using var connection = _connectionString.CreateConnection();
             var command = connection.CreateCommand();
@@ -30,7 +32,12 @@ namespace Authentication.Manager
 
         public Login GetLogin(string loginID)
         {
-            return Logins.FirstOrDefault(x => x.LoginID == loginID);
+            var login = Logins.FirstOrDefault(x => x.LoginID == loginID);
+            if (login is null)
+            {
+                login = _loginManager.GetLogin(loginID);
+            }
+            return login;
         }
 
         public async Task InsertLoginAsync(Login login)
@@ -41,16 +48,7 @@ namespace Authentication.Manager
                 return;
             }
 
-            using var connection = _connectionString.CreateConnection();
-            connection.Open();
-
-            var command = connection.CreateCommand();
-            command.CommandText = "insert into Login (LoginID, CustomerID, PasswordHash) values (@loginID, @customerID, @passwordHash)";
-            command.Parameters.AddWithValue("loginID", login.LoginID);
-            command.Parameters.AddWithValue("customerID", login.CustomerID);
-            command.Parameters.AddWithValue("passwordHash", login.PasswordHash);
-
-            await command.ExecuteNonQueryAsync();
+            await _loginManager.InsertLoginAsync(login);
         }
     }
 }

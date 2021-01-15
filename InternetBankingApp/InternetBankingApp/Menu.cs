@@ -193,21 +193,9 @@ Enter an option: ");
 
         private void DisplayTransferMenu()
         {
-            //TODO : refactor this.
-            Account savingsAcc = null;
-            Account checkingAcc = null;
-            if (_loggedInCustomer.HasSavingsAccount())
-            {
-                savingsAcc = _accountService.GetAccount("S", _loggedInCustomer);
-            }
-            if (_loggedInCustomer.HasCheckingAccount())
-            {
-                checkingAcc = _accountService.GetAccount("C", _loggedInCustomer);
-            }
-
             while (true)
             {
-                AccountSelectionMenu("Select an account to transfer money from", savingsAcc, checkingAcc);
+                AccountSelectionMenu("Select an account to transfer money from", _loggedInCustomer.SavingsAccount, _loggedInCustomer.CheckingAccount);
 
                 var input = Console.ReadLine();
                 Console.WriteLine();
@@ -252,7 +240,6 @@ Enter an option: ");
 
         private void Transfer(Account srcAccount)
         {
-
             while (true) {
                 Console.Write("Enter the account number you wish to transfer to, or press enter to return to the account selection menu : ");
                 var input = Console.ReadLine();
@@ -312,7 +299,8 @@ Enter the amount you would like to transfer to account {accountNumber}, or press
                     Console.WriteLine(e.Message);
                     continue;
                 }
-                Console.WriteLine($"Your balance is now ${srcAccount.Balance}");
+
+                DisplayBalance(srcAccount);
                 Console.WriteLine("Press any key to return to the account selection menu.");
                 Console.ReadKey();
                 AccountSelectionMenu("Select an account to transfer money from", _loggedInCustomer.SavingsAccount, _loggedInCustomer.CheckingAccount);
@@ -609,6 +597,8 @@ Enter the amount you would like to deposit, or press enter to return : $");
             }
         }
 
+
+        private void DisplayBalance(Account account) => Console.WriteLine($"Your balance is now {account.Balance.RoundUp()}");
 
         /// <summary>
         /// Hides users inputted keys.

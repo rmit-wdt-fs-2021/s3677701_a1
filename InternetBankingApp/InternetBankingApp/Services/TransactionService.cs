@@ -103,8 +103,9 @@ namespace InternetBankingApp.Services
 
         private bool HasFreeTransactions(Account account)
         {
+            const int freeTransactions = 4;
             var transactions = _transactionManager.GetTransactions(account.AccountNumber);
-            return transactions.Count(x => x.TransactionType == "T" || x.TransactionType == "W") <= 4;
+            return transactions.Count(x => x.TransactionType == "T" || x.TransactionType == "W") <= freeTransactions;
         }
 
         private static Transaction CreateTransaction(string transactionType, int accountNumber, decimal amount,

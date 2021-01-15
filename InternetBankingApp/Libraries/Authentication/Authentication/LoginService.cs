@@ -3,6 +3,7 @@ using Authentication.Manager;
 using Authentication.Model;
 using Newtonsoft.Json;
 using SimpleHashing;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -32,10 +33,19 @@ namespace Authentication
 
         private async Task<IList<Login>> GetLoginsAsync()
         {
+            List<Login> logins;
             using var client = new HttpClient();
-            var loginResponse = await client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/logins/");
-            var logins = JsonConvert.DeserializeObject<List<Login>>(loginResponse);
-
+            try
+            {
+                var loginResponse = await client.GetStringAsync("https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/logins/");
+                logins = JsonConvert.DeserializeObject<List<Login>>(loginResponse);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unable to contact login web service. Please try again later.");
+                Console.WriteLine(e.Message);
+                throw;
+            }
             return logins;
         }
 

@@ -39,7 +39,15 @@ namespace InternetBankingApp.Utilities
             var table = new DataTable();
             var adapter = new SqlDataAdapter(command);
 
-            await Task.Run(() => adapter.Fill(table));
+            try
+            {
+                await Task.Run(() => adapter.Fill(table));
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Something has gone on our end. Please try again later.");
+                throw;
+            }
             return table;
         }
 
