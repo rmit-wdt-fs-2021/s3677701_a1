@@ -583,7 +583,6 @@ Enter the amount you would like to deposit, or press enter to return : $");
                 else
                 {
                     // Update DB
-                    //_accountService.AddBalanceAsync(account, balance: decimal.Parse(input)).Wait();
                     _transactionService.AddTransactionAsync("D", account, decimal.Parse(input), DateTime.UtcNow).Wait();
 
                     Console.WriteLine($"Deposit of ${input} was succesful");
