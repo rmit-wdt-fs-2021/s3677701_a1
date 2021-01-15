@@ -63,3 +63,6 @@ reading data (GetDataTableAsync) from the DB.
 
 
 Starting code is referenced from Matthew Bolger's TuteLab03.
+Trello link : https://trello.com/b/XTUqGJAM/web-dev-tech-a1
+
+IMPORTANT : If you get an err about missing dlls please build class library first!
