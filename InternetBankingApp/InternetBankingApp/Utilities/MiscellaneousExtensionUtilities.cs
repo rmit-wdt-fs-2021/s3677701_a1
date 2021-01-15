@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 
 namespace InternetBankingApp.Utilities
@@ -17,8 +18,28 @@ namespace InternetBankingApp.Utilities
         public static DataTable GetDataTable(this SqlCommand command)
         {
             var table = new DataTable();
-            new SqlDataAdapter(command).Fill(table);
+            try
+            {
+                new SqlDataAdapter(command).Fill(table);
+            }catch(SqlException e)
+            {
+                Console.WriteLine("Unable to connect to Azure SQL Server at this moment. Please try again.");
+                throw;
+            }catch(Exception e)
+            {
+                Console.WriteLine("Something has gone wrong on our end. Please try again later.");
+                Console.WriteLine(e.Message);
+                throw;
+            }
+            return table;
+        }
 
+        public static async Task<DataTable> GetDataTableAsync(this SqlCommand command)
+        {
+            var table = new DataTable();
+            var adapter = new SqlDataAdapter(command);
+
+            await Task.Run(() => adapter.Fill(table));
             return table;
         }
 

@@ -35,17 +35,6 @@ namespace InternetBankingApp.Managers
             }).ToList();
         }
 
-        //public List<Transaction> GetTransactions(int accountNumber)
-        //{
-        //    var transactions = Transactions.Where(x => x.AccountNumber == accountNumber).ToList();
-        //    if(transactions == null || transactions.Count == 0)
-        //    {
-        //        transactions = GetAllTransactions(accountNumber).ToList();
-        //    }
-
-        //    return transactions;
-        //}
-
         public List<Transaction> GetTransactions(int accountNumber)
         {
             using var connection = _connectionString.CreateConnection();
@@ -53,7 +42,7 @@ namespace InternetBankingApp.Managers
             command.CommandText = "select * from [Transaction] where AccountNumber = @accountNumber";
             command.Parameters.AddWithValue("accountNumber", accountNumber);
 
-            return command.GetDataTable().Select().Select(x => new Transaction
+            var transactionList = command.GetDataTable().Select().Select(x => new Transaction
             {
                 TransactionID = (int)x["TransactionID"],
                 TransactionType = (string)x["TransactionType"],
@@ -63,6 +52,11 @@ namespace InternetBankingApp.Managers
                 Comment = Convert.IsDBNull(x["Comment"]) ? null : (string)x["Comment"],
                 TransactionTimeUtc = (DateTime)x["TransactionTimeUtc"]
             }).ToList();
+            if(transactionList == null)
+            {
+                Console.WriteLine("No transaction found for " + accountNumber);
+            }
+            return transactionList;
         }
 
         public async Task InsertTransactionAsync(Transaction transaction)

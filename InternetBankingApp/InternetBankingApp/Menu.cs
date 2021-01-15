@@ -302,18 +302,17 @@ Enter the amount you would like to transfer to account {accountNumber}, or press
                 Console.WriteLine();
                 // Update DB
                 var amt = decimal.Parse(transferInput);
+                const decimal transferCharge = 0.20M;
                 try
                 {
-                    _transactionService.AddTransactionAsync("T", srcAccount.AccountNumber, amt, DateTime.UtcNow, accountNumber, comment: desc).Wait();
-                    _transactionService.AddTransactionAsync("S", srcAccount.AccountNumber, 0.20M, DateTime.UtcNow).Wait();
+                    _transactionService.AddTransactionAsync("T", srcAccount, amt, DateTime.UtcNow, accountNumber, comment: desc).Wait();
+                    _transactionService.AddTransactionAsync("S", srcAccount, transferCharge, DateTime.UtcNow).Wait();
                 }catch(AggregateException e)
                 {
                     Console.WriteLine(e.Message);
                     continue;
                 }
-                // TODO fix
-                var updatedBalance = _accountService.GetAccountByNumber(srcAccount.AccountNumber).Balance;
-                Console.WriteLine($"Your balance is now ${updatedBalance}");
+                Console.WriteLine($"Your balance is now ${srcAccount.Balance}");
                 Console.WriteLine("Press any key to return to the account selection menu.");
                 Console.ReadKey();
                 AccountSelectionMenu("Select an account to transfer money from", _loggedInCustomer.SavingsAccount, _loggedInCustomer.CheckingAccount);
@@ -542,19 +541,19 @@ Enter the amount you would like to withdraw, or press enter to return : $");
                 {
                     try
                     {
-                        _transactionService.AddTransactionAsync("W", account.AccountNumber, decimal.Parse(input), DateTime.UtcNow).Wait();
-                        _transactionService.AddTransactionAsync("S", account.AccountNumber, 0.10M, DateTime.UtcNow).Wait();
+                        _transactionService.AddTransactionAsync("W", account, decimal.Parse(input), DateTime.UtcNow).Wait();
+                        _transactionService.AddTransactionAsync("S", account, 0.10M, DateTime.UtcNow).Wait();
 
                         Console.WriteLine($"Withdrawal of ${input} was succesful");
                     }
                     catch (AggregateException e)
                     {
-                        Console.WriteLine($"Withdrawing ${input} would overdraw the account. " +
-                            $"Checking account must have a minimum balance of $200.");
+                        Console.WriteLine("Withdrawal failed. Please try again.");
                         Console.WriteLine(e.Message);
                     }
                     catch (Exception e)
                     {
+                        Console.WriteLine("Something has gone wrong on our end. Please try again.");
                         Console.WriteLine(e.Message);
                     }
 
@@ -584,7 +583,7 @@ Enter the amount you would like to deposit, or press enter to return : $");
                 Console.WriteLine();
                 if (input == string.Empty)
                 {
-                    DisplayAccountsForWithdrawal();
+                    DisplayAccountsForDeposit();
                 }
 
                 if (!ValidateMoneyInput(input))
@@ -596,8 +595,8 @@ Enter the amount you would like to deposit, or press enter to return : $");
                 else
                 {
                     // Update DB
-                    _accountService.AddBalanceAsync(account, balance: decimal.Parse(input)).Wait();
-                    _transactionService.AddTransactionAsync("D", account.AccountNumber, decimal.Parse(input), DateTime.UtcNow).Wait();
+                    //_accountService.AddBalanceAsync(account, balance: decimal.Parse(input)).Wait();
+                    _transactionService.AddTransactionAsync("D", account, decimal.Parse(input), DateTime.UtcNow).Wait();
 
                     Console.WriteLine($"Deposit of ${input} was succesful");
                     Console.WriteLine($"Your balance is now {account.Balance}");

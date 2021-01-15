@@ -45,7 +45,7 @@ namespace InternetBankingApp.Services
                 throw new ArgumentNullException($"{nameof(account)} cannot be null.");
             }
 
-            if(ValidateWithdrawal(account, balance))
+            if(ValidateDeduction(account, balance))
             {
                 // Update DB
                 account.Balance -= balance;
@@ -65,7 +65,7 @@ namespace InternetBankingApp.Services
             }
         }
 
-        private bool ValidateWithdrawal(Account account, decimal balance)
+        private bool ValidateDeduction(Account account, decimal balance)
         {
             bool retVal = true;
 

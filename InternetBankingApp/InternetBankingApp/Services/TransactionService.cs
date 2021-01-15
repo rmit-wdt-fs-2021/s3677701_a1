@@ -22,10 +22,11 @@ namespace InternetBankingApp.Services
             _accountService = new AccountService(connectionString);
         }
 
-        public async Task AddTransactionAsync(string transactionType, int accountNumber, decimal amount,
+        public async Task AddTransactionAsync(string transactionType, Account account, decimal amount,
                                               DateTime transactionTime, int? destinationAccountNumber = null,
                                               string comment = null)
         {
+            int accountNumber = account.AccountNumber;
             if (transactionType is null || accountNumber == destinationAccountNumber || transactionType is null)
             {
                 throw new ArgumentException();
@@ -48,17 +49,16 @@ namespace InternetBankingApp.Services
                         throw new ArgumentException($"{nameof(destinationAccountNumber)} must be 4 digits.");
                     }
 
-                    await UpdateTransferAccountBalances(accountNumber, amount, destinationAccountNumber.Value);
+                    await UpdateTransferAccountBalances(account, amount, destinationAccountNumber.Value);
                     break;
                 case "D":
-                    await UpdateDepositAccountBalance(accountNumber, amount);
+                    await UpdateDepositAccountBalance(account, amount);
                     break;
                 case "W":
-                    await UpdateWithdrawnAccountBalance(accountNumber, amount);
+                    await UpdateWithdrawnAccountBalance(account, amount);
                     break;
                 case "S":
-                    var account = _accountService.GetAccountByNumber(accountNumber);
-                    if (account.HasFreeTransaction())
+                    if (HasFreeTransactions(account))
                     {
                         return;
                     }
@@ -78,20 +78,18 @@ namespace InternetBankingApp.Services
             await _accountService.DeductBalanceAsync(accountToCharge, serviceCharge);
         }
 
-        private async Task UpdateWithdrawnAccountBalance(int accountNumber, decimal amount)
+        private async Task UpdateWithdrawnAccountBalance(Account account, decimal amount)
         {
-            var account = _accountService.GetAccountByNumber(accountNumber);
             await _accountService.DeductBalanceAsync(account, amount);
         }
 
-        private async Task UpdateDepositAccountBalance(int accountNumber, decimal amount)
+        private async Task UpdateDepositAccountBalance(Account account, decimal amount)
         {
-            await _accountService.AddBalanceAsync(_accountService.GetAccountByNumber(accountNumber), amount);
+            await _accountService.AddBalanceAsync(account, amount);
         }
 
-        private async Task UpdateTransferAccountBalances(int accountNumber, decimal amount, int destinationAccountNumber)
+        private async Task UpdateTransferAccountBalances(Account srcAccount, decimal amount, int destinationAccountNumber)
         {
-            var srcAccount = _accountService.GetAccountByNumber(accountNumber);
             var destAccount = _accountService.GetAccountByNumber(destinationAccountNumber);
             await _accountService.DeductBalanceAsync(srcAccount, amount);
             await _accountService.AddBalanceAsync(destAccount, amount);
@@ -101,6 +99,12 @@ namespace InternetBankingApp.Services
         {
             ITransactionTarget transactionAdapter = new TransactionManagerAdapter(_connectionString);
             return transactionAdapter.GetPagedTransactions(account.AccountNumber, top, skip);
+        }
+
+        private bool HasFreeTransactions(Account account)
+        {
+            var transactions = _transactionManager.GetTransactions(account.AccountNumber);
+            return transactions.Count(x => x.TransactionType == "T" || x.TransactionType == "W") <= 4;
         }
 
         private static Transaction CreateTransaction(string transactionType, int accountNumber, decimal amount,

@@ -19,8 +19,15 @@ namespace InternetBankingApp.Models
 
         private const int FreeTransactions = 4;
 
-        public int ChargeableTransactions { get; set; } = 0;
-
-        public bool HasFreeTransaction() => Transactions.Count(x => x.TransactionType == "T" || x.TransactionType == "W") <= FreeTransactions;
+        //public bool HasFreeTransaction()
+        //{
+        //    if(Transactions == null)
+        //    {
+        //        Console.WriteLine("No transaction for " + AccountNumber);
+        //        return false;
+        //    }
+        //    return Transactions
+        //      .Count(x => x.TransactionType == "T" || x.TransactionType == "W") <= FreeTransactions;
+        //}
     }
 }
