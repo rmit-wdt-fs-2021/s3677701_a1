@@ -6,7 +6,7 @@ Submitted by Md Abir Ishtiaque, s3677701.
 Why have you used the patterns?
 
 Proxy - The proxy classes are responsible for caching data, and validates fields before inserting data.
-Adapter - The adapter pattern was used to provide the paging statements method which made use (or adapted) the
+Adapter - The adapter pattern was used to provide the paged bank statements method which made use (or adapted) the
         TransactionManagerProxy class.
 
 What advantages do they offer?
@@ -32,13 +32,30 @@ Adapter - The TransactionManagerProxy class can just be a usual proxy class like
 2. Justification of class library.
 Why have you used it?
 
-The Authentication class library is used to
+Class library is used to seperate bits of code that is re-usable in apps. Since all apps require authentication
+it made sense to seperate the auth service into a class library.
+
 What advantages does it offer?
 
-Having the auth code in a seperate class library will make it easier to re-use.
+If I were to develop a web-api or even a web UI for the banking app I can use this class library for authentication
+and so will not have to write the code again.
+
 How has it made your code elegant?
 
+The code is made more elegant as the auth logic is seperate from the other business logic.
+
 3. Justification of asynchronous keywords.
+
 Why has this feature been used?
+
+Using asynchronous programming improves performance bottlenecks and enhances overall responsiveness of the program.
+
 What advantages does it offer?
+
+Async/await is used to make I/O bound functions enable continuous switching between tasks in a single thread instead of 
+letting one task blocking the thread.
+
 You need to tell the marker clearly re the location of asynchronous feature in your solution.
+
+I have used the feature when reading the JSON from the web services, when inserting, updating, or
+reading data (GetDataTableAsync) from the DB.

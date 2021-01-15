@@ -13,6 +13,7 @@ namespace InternetBankingApp.Managers
     public class AccountManagerProxy : IAccountManager
     {
         private readonly string _connectionString;
+        private AccountManager _accountManager;
         
         public List<Account> Accounts { get; set; }
 
@@ -29,7 +30,7 @@ namespace InternetBankingApp.Managers
             command.CommandText = "select * from Account";
 
             ITransactionManager transactionManager = new TransactionManagerProxy(_connectionString);
-            return command.GetDataTable().Select().Select(x => new Account
+            return command.GetDataTableAsync().Result.Select().Select(x => new Account
             {
                 AccountNumber = (int)x["AccountNumber"],
                 AccountType = (string)x["AccountType"],
@@ -41,7 +42,13 @@ namespace InternetBankingApp.Managers
 
         public List<Account> GetAccounts(int customerID)
         {
-            return Accounts.Where(x => x.CustomerID == customerID).ToList();
+            var acc = Accounts.Where(x => x.CustomerID == customerID).ToList();
+            if (acc is null)
+            {
+                _accountManager = new AccountManager(_connectionString);
+                acc = _accountManager.GetAccounts(customerID);
+            }
+            return acc;
         }
 
         public Account GetAccountByNumber(int accountNumber)
@@ -87,7 +94,6 @@ namespace InternetBankingApp.Managers
 
             await command.ExecuteNonQueryAsync();
             Accounts = GetAllAccouts();
-            // TODO : err handle if update not successful
         }
     }
 }

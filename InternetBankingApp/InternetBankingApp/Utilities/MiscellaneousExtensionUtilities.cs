@@ -21,7 +21,7 @@ namespace InternetBankingApp.Utilities
             try
             {
                 new SqlDataAdapter(command).Fill(table);
-            }catch(SqlException e)
+            }catch (SqlException)
             {
                 Console.WriteLine("Unable to connect to Azure SQL Server at this moment. Please try again.");
                 throw;

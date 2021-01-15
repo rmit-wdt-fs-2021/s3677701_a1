@@ -18,7 +18,19 @@ namespace InternetBankingApp.Managers
 
         public Account GetAccountByNumber(int accountNumber)
         {
-            throw new System.NotImplementedException();
+            using var connection = _connectionString.CreateConnection();
+            var command = connection.CreateCommand();
+            command.CommandText = "select * from Account";
+
+            var accounts = command.GetDataTableAsync().Result.Select().Select(x => new Account
+            {
+                AccountNumber = (int)x["AccountNumber"],
+                AccountType = (string)x["AccountType"],
+                CustomerID = (int)x["CustomerID"],
+                Balance = (decimal)x["Balance"]
+            }).ToList();
+
+            return accounts.FirstOrDefault(x => x.AccountNumber == accountNumber);
         }
 
         public List<Account> GetAccounts(int customerID)
@@ -28,7 +40,7 @@ namespace InternetBankingApp.Managers
             command.CommandText = "select * from Account where CustomerID = @customerID";
             command.Parameters.AddWithValue("customerID", customerID);
 
-            return command.GetDataTable().Select().Select(x => new Account
+            return command.GetDataTableAsync().Result.Select().Select(x => new Account
             {
                 AccountNumber = (int)x["AccountNumber"],
                 AccountType = (string)x["AccountType"],

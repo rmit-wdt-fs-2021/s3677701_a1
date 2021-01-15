@@ -13,6 +13,7 @@ namespace InternetBankingApp.Managers
     public class CustomerManagerProxy : ICustomerManager
     {
         private readonly string _connectionString;
+        private CustomerManager _customerManager;
 
         public List<Customer> Customers { get; }
 
@@ -26,7 +27,7 @@ namespace InternetBankingApp.Managers
 
             var accountManager = new AccountManager(_connectionString);
 
-            Customers = command.GetDataTable().Select().Select(x => new Customer
+            Customers = command.GetDataTableAsync().Result.Select().Select(x => new Customer
             {
                 CustomerID = (int)x["CustomerID"],
                 Name = (string)x["Name"],
@@ -39,7 +40,15 @@ namespace InternetBankingApp.Managers
 
         public Customer GetCustomer(int customerID)
         {
-            return Customers.FirstOrDefault(x => x.CustomerID == customerID);
+            var customer = Customers.FirstOrDefault(x => x.CustomerID == customerID);
+
+            if(customer is null)
+            {
+                _customerManager = new CustomerManager(_connectionString);
+                customer = _customerManager.GetCustomer(customerID);
+            }
+
+            return customer;
         }
 
 
@@ -52,7 +61,7 @@ namespace InternetBankingApp.Managers
 
             using var connection = _connectionString.CreateConnection();
             connection.Open();
-            // TODO : add try/catch ?
+
             var cmd = connection.CreateCommand();
             cmd.CommandText = "insert into Customer (CustomerID, Name, Address, City, PostCode) values (@customerID, @name, @address, @city, @postCode)";
             cmd.Parameters.AddWithValue("customerID", customer.CustomerID);

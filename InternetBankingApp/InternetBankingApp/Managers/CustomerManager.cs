@@ -29,15 +29,16 @@ namespace InternetBankingApp.Managers
             var command = connection.CreateCommand();
             command.CommandText = "select * from Customer";
 
-            // TODO : var accountManager = new AccountManager(_connectionString);
+            var accountManager = new AccountManager(_connectionString);
 
-            return command.GetDataTable().Select().Select(x => new Customer
+            return command.GetDataTableAsync().Result.Select().Select(x => new Customer
             {
                 CustomerID = (int)x["CustomerID"],
                 Name = (string)x["Name"],
-                Address = (string)x["Address"],
-                City = (string)x["City"],
-                PostCode = (string)x["PostCode"]
+                Address = Convert.IsDBNull(x["Address"]) ? null : (string)x["Address"],
+                City = Convert.IsDBNull(x["City"]) ? null : (string)x["City"],
+                PostCode = Convert.IsDBNull(x["PostCode"]) ? null : (string)x["PostCode"],
+                Accounts = accountManager.GetAccounts((int)x["CustomerID"])
             }).ToList();
         }
 

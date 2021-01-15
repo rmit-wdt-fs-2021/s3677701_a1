@@ -2,6 +2,7 @@
 using InternetBankingApp.Managers;
 using InternetBankingApp.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,9 @@ namespace InternetBankingApp.Services
         private readonly ICustomerManager _customerManager;
         private readonly IAccountManager _accountManager;
         private readonly ITransactionManager _transactionManager;
-        private readonly string _connectionString;
 
         public CustomerService(string connectionString)
         {
-            _connectionString = connectionString;
             _customerManager = new CustomerManagerProxy(connectionString);
             _accountManager = new AccountManagerProxy(connectionString);
             _transactionManager = new TransactionManagerProxy(connectionString);
@@ -43,8 +42,12 @@ namespace InternetBankingApp.Services
                 {
                     DateFormatString = "dd/MM/yyyy hh:mm:ss tt"
                 });
+                if (IsValidData(customers))
+                {
+                    throw new JsonException("Error reading data.");
+                }
             }
-            catch(AggregateException e)
+            catch (AggregateException e)
             {
                 Console.WriteLine("Unable to contact web service. Please try again later.");
                 Console.WriteLine(e.Message);
@@ -81,11 +84,47 @@ namespace InternetBankingApp.Services
             }
         }
 
-
-        //TODO
-        private bool IsValidJson(string json)
+        private bool IsValidData(List<Customer> customers)
         {
-            return true;
+            bool retVal = true;
+            foreach(var customer in customers)
+            {
+                if(customer.CustomerID.ToString().Length != 4)
+                {
+                    retVal = false;
+                }
+
+                foreach(var account in customer.Accounts)
+                {
+                    if(account.AccountNumber.ToString().Length != 4)
+                    {
+                        retVal = false;
+                    }
+
+                    if(account.AccountType != "S" || account.AccountType != "C")
+                    {
+                        retVal = false;
+                    }
+
+                    if (customer.HasCheckingAccount())
+                    {
+                        if(customer.CheckingAccount.Balance < 200)
+                        {
+                            retVal = false;
+                        }
+                    }
+
+                    if (customer.HasSavingsAccount())
+                    {
+                        if(customer.SavingsAccount.Balance <= 0)
+                        {
+                            retVal = false;
+                        }
+                    }
+                }
+            }
+
+            return retVal;
         }
     }
 }

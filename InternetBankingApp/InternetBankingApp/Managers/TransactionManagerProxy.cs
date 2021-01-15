@@ -42,7 +42,7 @@ namespace InternetBankingApp.Managers
             command.CommandText = "select * from [Transaction] where AccountNumber = @accountNumber";
             command.Parameters.AddWithValue("accountNumber", accountNumber);
 
-            var transactionList = command.GetDataTable().Select().Select(x => new Transaction
+            var transactionList = command.GetDataTableAsync().Result.Select().Select(x => new Transaction
             {
                 TransactionID = (int)x["TransactionID"],
                 TransactionType = (string)x["TransactionType"],
@@ -52,10 +52,7 @@ namespace InternetBankingApp.Managers
                 Comment = Convert.IsDBNull(x["Comment"]) ? null : (string)x["Comment"],
                 TransactionTimeUtc = (DateTime)x["TransactionTimeUtc"]
             }).ToList();
-            if(transactionList == null)
-            {
-                Console.WriteLine("No transaction found for " + accountNumber);
-            }
+
             return transactionList;
         }
 
